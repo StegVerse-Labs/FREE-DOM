@@ -16,6 +16,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,19 +45,22 @@ jobs:
             --keys secure_submission_url,private_store_endpoint,osint/* \
             --out /tmp/tv.json
 
-      - name: Mask values in logs (defensive; do not echo secrets)
+      - name: Mask values in logs (defensive)
         run: |
-          SECURE_URL=$(jq -r '.secure_submission_url // empty' /tmp/tv.json)
-          if [ -n "$SECURE_URL" ]; then
-            echo "::add-mask::$SECURE_URL"
+          if [ -f /tmp/tv.json ]; then
+            for val in $(jq -r '.[]? // empty' /tmp/tv.json); do
+              if [ -n "$val" ]; then
+                echo "::add-mask::$val"
+              fi
+            done
           fi
           echo "TV values acquired. (Secrets masked.)"
 
       - name: Build Version Badge
-        run: python scripts/make_version_badge.py || true
+        run: python scripts/make_version_badge.py
 
       - name: Build Freshness Badge
-        run: python scripts/make_freshness_badge.py || true
+        run: python scripts/make_freshness_badge.py
 
       - name: Merge pending + validate
         run: |
@@ -77,6 +81,7 @@ jobs:
             data/unverified/**
             data/archive/**
           message: "chore(auto-update): merge + rebuild + badges + validate"
+          default_author: github_actions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
