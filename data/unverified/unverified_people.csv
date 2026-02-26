@@ -1,3 +1,4 @@
 person,possible_event_date,location,alleged_association,source,confidence,notes,next_step
 John D.,2003-07-01,"London, UK",Met with group,tabloid (unconfirmed),low,name appears once; no cross-source,cross-check dockets/flight logs
 John Doe,2025-01-01,,Alleged participant,Confirm via documentation,,,
+John Doe,2025-01-01,,Alleged participant,https://source.com,0.40,Unverified association,Confirm via documentation
