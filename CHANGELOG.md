@@ -1,3 +1,36 @@
+# 🧾 FREE-DOM — CHANGELOG
+
+All notable changes are recorded by the `Auto Update` workflow.
+
+---
+
+## v7.0.0 — 2026-02-26
+**Commit:** `fd7a7e5` — Update ai_search_agent.yml  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 22433877473)
+
+<details><summary>Changed files</summary>
+
+```txt
+.github/workflows/ai_search_agent.yml
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1165 |
+| verified_people_events.csv | 2 |
+| unverified_events.csv | 1 |
+| unverified_people.csv | 1 |
+| unverified_connections.csv | 1 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 ## v6.0.0 — 2026-02-26
 **Commit:** `e165e90` — Update update_timeline.py  
 **Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 22433793755)
