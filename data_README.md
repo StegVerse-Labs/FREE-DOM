@@ -1,25 +1,23 @@
-# Data Folder Overview
+# Data Folder Reference
 
-This directory houses all factual data, pending leads, and AI-agent results for the FREE-DOM project.
+The canonical documentation for the FREE-DOM data layer lives at:
 
-## Structure
+- `data/README.md`
 
-| Subfolder | Contents | Description |
-|------------|-----------|--------------|
-| `master/` | `master_timeline.csv`, `verified_people_events.csv` | Canonical, validated datasets used in all outputs |
-| `pending/` | `events/`, `people/`, `unverified/` | New incoming data awaiting validation or AI search enrichment |
-| `unverified/` | CSVs of events, people, or connections lacking confirmation | Used to track uncertain data |
-| `sources/` | `sources_whitelist.csv` | List of approved RSS/news feeds monitored by the AI agent |
-| `logs/ai_agent/` | `agent_run_*.jsonl` | Machine logs from each public-source scan |
-| `summary/` | `ai_agent_summary.csv`, `ai_agent_sources_index.csv` | Summaries of sources, hits, and coverage metrics |
-| `archive/` | Archived imports after merge | Permanent, timestamped records of older batches |
+This file exists only as an index pointer to reduce duplication and prevent documentation drift.
 
-## How It Works
+## Quick Summary
 
-1. You or the AI add **pending CSVs** in the relevant subfolder.  
-2. The **Auto Update workflow** merges them into `data/master/`.  
-3. The **AI Search Agent** sweeps all public sources to verify leads.  
-4. Verified leads move from `unverified/` → `master/`.  
-5. Everything else remains in the pipeline until confirmed.
+All structured datasets, ingestion inputs, automation outputs, logs, summaries, and archives are stored under:
 
----
+- `data/`
+
+Primary subfolders:
+
+- `data/master/` — canonical verified datasets
+- `data/pending/` — incoming batches awaiting merge/review
+- `data/unverified/` — leads not yet verified
+- `data/sources/` — approved public-source whitelist (RSS/news)
+- `data/logs/ai_agent/` — raw JSONL logs from agent sweeps
+- `data/summary/` — dashboards, versioning, coverage metrics
+- `data/archive/` — timestamped processed batches for audit history
