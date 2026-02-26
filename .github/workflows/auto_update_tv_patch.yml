@@ -1,18 +1,17 @@
 name: Auto Update (with TV)
 
 on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "data/**"
+      - "scripts/**"
+      - ".github/workflows/**"
   workflow_dispatch: {}
-  # Optional: if you want it to run daily/weekly, uncomment:
-  # schedule:
-  #   - cron: "15 7 * * 1"   # Mondays 07:15 UTC
 
 permissions:
   contents: write
   id-token: write
-
-concurrency:
-  group: free-dom-auto-update
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -20,58 +19,51 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests pandas
-
-      - name: Install jq (for masking helper)
+      - name: Install system deps
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
 
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas
+
       - name: Fetch short-lived secrets from TV
-        env:
-          TV_BASE_URL: "https://TV_BASE_URL"  # <-- REPLACE ME
         run: |
           python scripts/tv_fetch.py \
-            --tv-url "${TV_BASE_URL}" \
-            --role "free-dom/ci/auto-update" \
-            --aud "stegverse-tv" \
-            --keys "secure_submission_url,private_store_endpoint" \
-            --out "${{ runner.temp }}/tv.json"
+            --tv-url https://TV_BASE_URL \
+            --role free-dom/ci/auto-update \
+            --aud stegverse-tv \
+            --keys secure_submission_url,private_store_endpoint,osint/* \
+            --out /tmp/tv.json
 
       - name: Mask values in logs (defensive; do not echo secrets)
         run: |
-          SECURE_URL="$(jq -r '.secure_submission_url // empty' "${{ runner.temp }}/tv.json")"
-          PRIVATE_EP="$(jq -r '.private_store_endpoint // empty' "${{ runner.temp }}/tv.json")"
-          if [ -n "$SECURE_URL" ]; then echo "::add-mask::$SECURE_URL"; fi
-          if [ -n "$PRIVATE_EP" ]; then echo "::add-mask::$PRIVATE_EP"; fi
+          SECURE_URL=$(jq -r '.secure_submission_url // empty' /tmp/tv.json)
+          if [ -n "$SECURE_URL" ]; then
+            echo "::add-mask::$SECURE_URL"
+          fi
           echo "TV values acquired. (Secrets masked.)"
 
-      # NOTE: This workflow should NOT write directly to data/master from TV.
-      # TV is only used for secrets/endpoints; ingestion still goes through data/pending.
-
-      - name: Merge pending + validate
-        run: |
-          python scripts/import_pending.py --base .
-          python scripts/build_checklist.py
-          python scripts/build_changelog.py
-          python scripts/update_timeline.py --base .
-
       - name: Build Version Badge
-        run: python scripts/make_version_badge.py
+        run: python scripts/make_version_badge.py || true
 
       - name: Build Freshness Badge
         run: python scripts/make_freshness_badge.py || true
+
+      - name: Merge pending + validate
+        run: |
+          python scripts/import_pending.py
+          python scripts/build_checklist.py
+          python scripts/build_changelog.py
+          python scripts/update_timeline.py
 
       - name: Commit artifacts (if changed)
         uses: EndBug/add-and-commit@v9
@@ -79,15 +71,15 @@ jobs:
           add: |
             CHANGELOG.md
             CHECKLIST.md
-            data/summary/
-            data/master/
-            data/unverified/
-            data/archive/
-            docs/badges/
-          message: "chore(auto-update-tv): merge + rebuild + validate + badges"
+            data/summary/**
+            docs/badges/**
+            data/master/**
+            data/unverified/**
+            data/archive/**
+          message: "chore(auto-update): merge + rebuild + badges + validate"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup secret file
         if: always()
-        run: rm -f "${{ runner.temp }}/tv.json"
+        run: rm -f /tmp/tv.json
