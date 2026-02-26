@@ -38,7 +38,7 @@ jobs:
       - name: Fetch short-lived secrets from TV
         run: |
           python scripts/tv_fetch.py \
-            --tv-url https://TV_BASE_URL \
+            --tv-url https://StegVerse-Labs/TV \
             --role free-dom/ci/auto-update \
             --aud stegverse-tv \
             --keys secure_submission_url,private_store_endpoint,osint/* \
