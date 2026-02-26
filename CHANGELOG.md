@@ -1,3 +1,30 @@
+## v6.0.0 — 2026-02-26
+**Commit:** `e165e90` — Update update_timeline.py  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 22433793755)
+
+<details><summary>Changed files</summary>
+
+```txt
+scripts/update_timeline.py
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1165 |
+| verified_people_events.csv | 2 |
+| unverified_events.csv | 1 |
+| unverified_people.csv | 1 |
+| unverified_connections.csv | 1 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 # 🧾 FREE-DOM — CHANGELOG
 
 All notable changes are recorded by the `Auto Update` workflow.
