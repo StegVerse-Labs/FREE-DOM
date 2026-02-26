@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-# Builds two analytics files from AI Search Agent logs:
-# - data/ai_agent_summary.csv (one row per run with counts and source breakdown)
-# - data/ai_agent_sources_index.csv (cumulative set of seen sources)
-from __future__ import annotations
-import json, csv, pathlib, urllib.parse
+"""
+Builds two analytics files from AI Search Agent logs (portable via --base):
+- <base>/data/summary/ai_agent_summary.csv
+- <base>/data/summary/ai_agent_sources_index.csv
+Reads logs from: <base>/data/logs/ai_agent/agent_run_*.jsonl
+"""
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-DATA = ROOT / "data"
-LOGS = DATA / "ai_agent_logs"
-OUT_SUM = DATA / "ai_agent_summary.csv"
-OUT_SRC = DATA / "ai_agent_sources_index.csv"
+from __future__ import annotations
+import argparse, json, csv, pathlib, urllib.parse
 
 def domain_of(url: str) -> str:
     try:
@@ -18,15 +16,19 @@ def domain_of(url: str) -> str:
     except Exception:
         return ""
 
-def iter_runs():
-    if not LOGS.exists():
-        return
-    for p in sorted(LOGS.glob("agent_run_*.jsonl")):
-        ts = p.stem.replace("agent_run_","",1)
-        yield ts, p
-
 def main():
-    # Load previous sources index if exists
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--base", default=".", help="Scope base directory")
+    args = ap.parse_args()
+
+    BASE = pathlib.Path(args.base).resolve()
+    DATA = BASE / "data"
+    LOGS = DATA / "logs" / "ai_agent"
+    OUT_SUM = DATA / "summary" / "ai_agent_summary.csv"
+    OUT_SRC = DATA / "summary" / "ai_agent_sources_index.csv"
+
+    OUT_SUM.parent.mkdir(parents=True, exist_ok=True)
+
     seen_sources = {}
     if OUT_SRC.exists():
         with OUT_SRC.open(newline="", encoding="utf-8") as f:
@@ -38,6 +40,13 @@ def main():
                     "unique_links": int(r.get("unique_links","0") or 0),
                 }
 
+    def iter_runs():
+        if not LOGS.exists():
+            return
+        for p in sorted(LOGS.glob("agent_run_*.jsonl")):
+            ts = p.stem.replace("agent_run_","",1)
+            yield ts, p
+
     summary_rows = []
     global_seen_links = set()
 
@@ -45,8 +54,7 @@ def main():
         total_hits = 0
         links_this_run = set()
         sources_this_run = []
-        if not path.exists():
-            continue
+
         with path.open(encoding="utf-8") as f:
             for line in f:
                 try:
@@ -93,8 +101,6 @@ def main():
             "new_sources": ";".join(new_sources),
         })
 
-    # Write summary
-    OUT_SUM.parent.mkdir(parents=True, exist_ok=True)
     with OUT_SUM.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=[
             "run_timestamp","total_hits","new_leads","unique_links",
@@ -104,17 +110,13 @@ def main():
         for r in summary_rows:
             w.writerow(r)
 
-    # Write sources index
     with OUT_SRC.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=[
             "source_domain","first_seen_run","last_seen_run","total_hits","unique_links"
         ])
         w.writeheader()
         for src, agg in sorted(seen_sources.items(), key=lambda kv: kv[0]):
-            w.writerow({
-                "source_domain": src,
-                **agg
-            })
+            w.writerow({"source_domain": src, **agg})
 
     print(f"Wrote {OUT_SUM} and {OUT_SRC}")
 
