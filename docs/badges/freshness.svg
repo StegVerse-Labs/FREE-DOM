@@ -1,136 +1,20 @@
-#!/usr/bin/env python3
-"""
-Generate a "freshness" badge for FREE-DOM.
-
-Inputs (preferred → fallback):
-1) data/summary/ai_agent_summary.csv (latest run_timestamp)
-2) data/logs/ai_agent/agent_run_*.jsonl (latest timestamp in filename)
-
-Output:
-- docs/badges/freshness.svg
-
-Badge text rules:
-- Fresh (<= 2 days)
-- Stale (<= 7 days)
-- Old (> 7 days)
-- Unknown (no signals)
-"""
-
-from __future__ import annotations
-import csv
-import re
-from datetime import datetime, timezone
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "data"
-SUMMARY = DATA / "summary" / "ai_agent_summary.csv"
-LOGS = DATA / "logs" / "ai_agent"
-OUT = ROOT / "docs" / "badges" / "freshness.svg"
-
-TS_RE = re.compile(r"agent_run_(\d{8}T\d{6}Z)\.jsonl$")
-
-def parse_run_ts(ts: str) -> datetime | None:
-    ts = (ts or "").strip()
-    if not ts:
-        return None
-    try:
-        return datetime.strptime(ts, "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)
-    except ValueError:
-        return None
-
-def latest_from_summary() -> datetime | None:
-    if not SUMMARY.exists():
-        return None
-    rows = []
-    with SUMMARY.open(newline="", encoding="utf-8") as f:
-        r = csv.DictReader(f)
-        for row in r:
-            rows.append(row)
-    if not rows:
-        return None
-    # choose max run_timestamp lexicographically since it's sortable format
-    ts = max((row.get("run_timestamp","") for row in rows), default="")
-    return parse_run_ts(ts)
-
-def latest_from_logs() -> datetime | None:
-    if not LOGS.exists():
-        return None
-    best: datetime | None = None
-    for p in LOGS.glob("agent_run_*.jsonl"):
-        m = TS_RE.search(p.name)
-        if not m:
-            continue
-        dt = parse_run_ts(m.group(1))
-        if dt and (best is None or dt > best):
-            best = dt
-    return best
-
-def classify(age_days: float) -> tuple[str, str]:
-    # label, message
-    if age_days <= 2:
-        return ("Fresh", f"{age_days:.1f}d")
-    if age_days <= 7:
-        return ("Stale", f"{age_days:.1f}d")
-    return ("Old", f"{age_days:.1f}d")
-
-def make_badge_svg(label: str, value: str) -> str:
-    # Minimal, self-contained SVG badge (no external deps)
-    # Note: widths are approximate; good enough for simple labels.
-    left_text = "Freshness"
-    right_text = value if label != "Unknown" else "unknown"
-
-    # crude width estimates: 6px per char + padding
-    left_w = 10 + len(left_text) * 6
-    right_w = 10 + len(right_text) * 6
-    total_w = left_w + right_w
-
-    # color by label
-    if label == "Fresh":
-        color = "#2ea44f"
-    elif label == "Stale":
-        color = "#dbab09"
-    elif label == "Old":
-        color = "#d73a49"
-    else:
-        color = "#6a737d"
-
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="20" role="img" aria-label="{left_text}: {right_text}">
-  <linearGradient id="s" x2="0" y2="100%">
-    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
-    <stop offset="1" stop-opacity=".1"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="154" height="20" role="img" aria-label="freshness: 2026-02-26">
+  <linearGradient id="g" x2="0" y2="100%">
+    <stop offset="0" stop-color="#fff" stop-opacity=".7"/>
+    <stop offset=".1" stop-opacity=".1"/>
+    <stop offset=".9" stop-opacity=".3"/>
+    <stop offset="1" stop-opacity=".5"/>
   </linearGradient>
-  <clipPath id="r">
-    <rect width="{total_w}" height="20" rx="3" fill="#fff"/>
-  </clipPath>
-  <g clip-path="url(#r)">
-    <rect width="{left_w}" height="20" fill="#555"/>
-    <rect x="{left_w}" width="{right_w}" height="20" fill="{color}"/>
-    <rect width="{total_w}" height="20" fill="url(#s)"/>
+  <mask id="m">
+    <rect width="154" height="20" rx="3" fill="#fff"/>
+  </mask>
+  <g mask="url(#m)">
+    <rect width="74" height="20" fill="#555"/>
+    <rect x="74" width="80" height="20" fill="#2ca02c"/>
+    <rect width="154" height="20" fill="url(#g)"/>
   </g>
-  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
-    <text x="{left_w/2:.1f}" y="14">{left_text}</text>
-    <text x="{left_w + right_w/2:.1f}" y="14">{right_text}</text>
+  <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+    <text x="37.0" y="14">freshness</text>
+    <text x="114.0" y="14">2026-02-26</text>
   </g>
 </svg>
-"""
-
-def main() -> None:
-    now = datetime.now(timezone.utc)
-
-    last = latest_from_summary() or latest_from_logs()
-
-    if last is None:
-        svg = make_badge_svg("Unknown", "unknown")
-    else:
-        age = (now - last).total_seconds() / 86400.0
-        label, value = classify(age)
-        # include date hint if you want: value = f"{value} ({last.strftime('%Y-%m-%d')})"
-        svg = make_badge_svg(label, value)
-
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(svg, encoding="utf-8")
-    print(f"Wrote {OUT}")
-
-if __name__ == "__main__":
-    main()
