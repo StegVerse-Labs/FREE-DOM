@@ -1,32 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import csv
-import pathlib
+import argparse, csv, pathlib
 from datetime import datetime
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-DATA = ROOT / "data"
-ARCHIVE = DATA / "archive"
-
-MASTER = DATA / "master_timeline.csv"
-PEOPLE = DATA / "verified_people_events.csv"
-
-UNVER_EVENTS = DATA / "unverified_events.csv"
-UNVER_PEOPLE = DATA / "unverified_people.csv"
-UNVER_CONN = DATA / "unverified_connections.csv"
-
-REQ_MASTER = ["date","location","event","participants_on_record","source_urls","notes"]
-OPT_MASTER = ["deep_search_event","deep_search_notes"]
-ALL_MASTER = REQ_MASTER + OPT_MASTER
-
-REQ_PEOPLE = ["date","location","event","person","role","source_urls","deep_search_person","deep_search_notes"]
-
-REQ_UNVER_EVENTS = ["date","location","event","primary_source","secondary_source","confidence","notes","next_step"]
-REQ_UNVER_PEOPLE = ["person","possible_event_date","location","alleged_association","source","confidence","notes","next_step"]
-REQ_UNVER_CONN = ["entity_a","entity_b","connection_type","source","confidence","notes","next_step"]
-
 def read_csv(path: pathlib.Path) -> list[dict]:
-    if not path.exists(): return []
+    if not path.exists():
+        return []
     with path.open(newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
@@ -41,6 +20,16 @@ def write_csv(path: pathlib.Path, rows: list[dict], headers: list[str]) -> None:
 def ensure_file(path: pathlib.Path, headers: list[str]) -> None:
     if not path.exists():
         write_csv(path, [], headers)
+
+REQ_MASTER = ["date","location","event","participants_on_record","source_urls","notes"]
+OPT_MASTER = ["deep_search_event","deep_search_notes"]
+ALL_MASTER = REQ_MASTER + OPT_MASTER
+
+REQ_PEOPLE = ["date","location","event","person","role","source_urls","deep_search_person","deep_search_notes"]
+
+REQ_UNVER_EVENTS = ["date","location","event","primary_source","secondary_source","confidence","notes","next_step"]
+REQ_UNVER_PEOPLE = ["person","possible_event_date","location","alleged_association","source","confidence","notes","next_step"]
+REQ_UNVER_CONN = ["entity_a","entity_b","connection_type","source","confidence","notes","next_step"]
 
 def normalize_master_row(r: dict) -> dict:
     out = {}
@@ -67,31 +56,6 @@ def parse_date_key(d: str) -> tuple:
             pass
     return (1, 9999, 12, 31, d or "~")
 
-def merge_master():
-    ensure_file(MASTER, ALL_MASTER)
-    master_rows = read_csv(MASTER)
-    merged, seen = [], set()
-    for r in master_rows:
-        for k in OPT_MASTER:
-            r.setdefault(k, "")
-        nr = normalize_master_row(r); k = key_master(nr)
-        if k not in seen:
-            merged.append(nr); seen.add(k)
-
-    for p in sorted(DATA.glob("pending_updates_*.csv")):
-        chunk = read_csv(p)
-        if not chunk: continue
-        for r in chunk:
-            for k in OPT_MASTER:
-                r.setdefault(k, "")
-            nr = normalize_master_row(r); k = key_master(nr)
-            if k not in seen:
-                merged.append(nr); seen.add(k)
-
-    merged.sort(key=lambda r: (parse_date_key(r["date"]), r["location"].lower(), r["event"].lower()))
-    write_csv(MASTER, merged, ALL_MASTER)
-    return [p for p in sorted(DATA.glob("pending_updates_*.csv"))]
-
 def normalize_people_row(r: dict) -> dict:
     out = {}
     for k in REQ_PEOPLE:
@@ -103,19 +67,54 @@ def normalize_people_row(r: dict) -> dict:
 def key_people(r: dict) -> tuple:
     return (r.get("date","").strip(), r.get("location","").strip(), r.get("event","").strip(), r.get("person","").strip())
 
-def merge_people():
+def merge_master(DATA: pathlib.Path) -> list[pathlib.Path]:
+    MASTER = DATA / "master" / "master_timeline.csv"
+    ensure_file(MASTER, ALL_MASTER)
+    master_rows = read_csv(MASTER)
+
+    merged, seen = [], set()
+    for r in master_rows:
+        for k in OPT_MASTER:
+            r.setdefault(k, "")
+        nr = normalize_master_row(r); k = key_master(nr)
+        if k not in seen:
+            merged.append(nr); seen.add(k)
+
+    pending_dir = DATA / "pending"
+    pendings = []
+    for p in sorted(pending_dir.glob("pending_updates_*.csv")):
+        chunk = read_csv(p)
+        if not chunk:
+            continue
+        pendings.append(p)
+        for r in chunk:
+            for k in OPT_MASTER:
+                r.setdefault(k, "")
+            nr = normalize_master_row(r); k = key_master(nr)
+            if k not in seen:
+                merged.append(nr); seen.add(k)
+
+    merged.sort(key=lambda r: (parse_date_key(r["date"]), r["location"].lower(), r["event"].lower()))
+    write_csv(MASTER, merged, ALL_MASTER)
+    return pendings
+
+def merge_people(DATA: pathlib.Path) -> list[pathlib.Path]:
+    PEOPLE = DATA / "master" / "verified_people_events.csv"
     ensure_file(PEOPLE, REQ_PEOPLE)
     existing = read_csv(PEOPLE)
+
     merged, seen = [], set()
     for r in existing:
         nr = normalize_people_row(r); k = key_people(nr)
         if k not in seen:
             merged.append(nr); seen.add(k)
 
+    pending_dir = DATA / "pending"
     pendings = []
-    for p in sorted(DATA.glob("pending_people_*.csv")):
+    for p in sorted(pending_dir.glob("pending_people_*.csv")):
         chunk = read_csv(p)
-        if not chunk: continue
+        if not chunk:
+            continue
         pendings.append(p)
         if any(h not in chunk[0].keys() for h in REQ_PEOPLE):
             raise SystemExit(f"{p.name} missing required headers")
@@ -128,34 +127,43 @@ def merge_people():
     write_csv(PEOPLE, merged, REQ_PEOPLE)
     return pendings
 
-def merge_unverified():
+def merge_unverified(DATA: pathlib.Path) -> list[pathlib.Path]:
+    UNVER_EVENTS = DATA / "unverified" / "unverified_events.csv"
+    UNVER_PEOPLE = DATA / "unverified" / "unverified_people.csv"
+    UNVER_CONN = DATA / "unverified" / "unverified_connections.csv"
+
     ensure_file(UNVER_EVENTS, REQ_UNVER_EVENTS)
     ensure_file(UNVER_PEOPLE, REQ_UNVER_PEOPLE)
     ensure_file(UNVER_CONN, REQ_UNVER_CONN)
 
-    ue = read_csv(UNVER_EVENTS); up = read_csv(UNVER_PEOPLE); uc = read_csv(UNVER_CONN)
+    ue = read_csv(UNVER_EVENTS)
+    up = read_csv(UNVER_PEOPLE)
+    uc = read_csv(UNVER_CONN)
 
     def dedupe(existing, headers):
         seen_local = set(); out = []
         for r in existing:
             key = tuple((r.get(h,"") or "").strip() for h in headers)
             if key not in seen_local:
-                out.append({h: r.get(h,"") for h in headers}); seen_local.add(key)
+                out.append({h: (r.get(h,"") or "").strip() for h in headers})
+                seen_local.add(key)
         return out
 
+    pending_dir = DATA / "pending"
     pendings = []
-    for p in sorted(DATA.glob("pending_unverified_*.csv")):
+    for p in sorted(pending_dir.glob("pending_unverified_*.csv")):
         rows = read_csv(p)
-        if not rows: continue
+        if not rows:
+            continue
         pendings.append(p)
         for r in rows:
             t = (r.get("type","") or "").strip().lower()
             if t == "event":
-                item = {h: (r.get(h,"") or "").strip() for h in REQ_UNVER_EVENTS}; ue.append(item)
+                ue.append({h: (r.get(h,"") or "").strip() for h in REQ_UNVER_EVENTS})
             elif t == "person":
-                item = {h: (r.get(h,"") or "").strip() for h in REQ_UNVER_PEOPLE}; up.append(item)
+                up.append({h: (r.get(h,"") or "").strip() for h in REQ_UNVER_PEOPLE})
             elif t == "connection":
-                item = {h: (r.get(h,"") or "").strip() for h in REQ_UNVER_CONN}; uc.append(item)
+                uc.append({h: (r.get(h,"") or "").strip() for h in REQ_UNVER_CONN})
 
     ue = dedupe(ue, REQ_UNVER_EVENTS)
     up = dedupe(up, REQ_UNVER_PEOPLE)
@@ -168,21 +176,31 @@ def merge_unverified():
     write_csv(UNVER_EVENTS, ue, REQ_UNVER_EVENTS)
     write_csv(UNVER_PEOPLE, up, REQ_UNVER_PEOPLE)
     write_csv(UNVER_CONN, uc, REQ_UNVER_CONN)
+
     return pendings
 
-def archive(files):
+def archive_files(archive_dir: pathlib.Path, files: list[pathlib.Path]) -> None:
     ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    archive_dir.mkdir(parents=True, exist_ok=True)
     for p in files:
-        (ARCHIVE / f"{p.stem}.processed_{ts}.csv").parent.mkdir(parents=True, exist_ok=True)
-        p.replace(ARCHIVE / f"{p.stem}.processed_{ts}.csv")
+        dest = archive_dir / f"{p.stem}.processed_{ts}{p.suffix}"
+        p.replace(dest)
 
 def main():
-    ARCHIVE.mkdir(parents=True, exist_ok=True)
-    pu = merge_master()
-    pp = merge_people()
-    pu2 = merge_unverified()
-    archive(pu + pp + pu2)
-    print("Merged events, people, and unverified leads successfully.")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--base", default=".", help="Scope base directory")
+    args = ap.parse_args()
+
+    BASE = pathlib.Path(args.base).resolve()
+    DATA = BASE / "data"
+    ARCHIVE = DATA / "archive"
+
+    pu = merge_master(DATA)
+    pp = merge_people(DATA)
+    pu2 = merge_unverified(DATA)
+
+    archive_files(ARCHIVE, pu + pp + pu2)
+    print("Merged master + people + unverified successfully.")
 
 if __name__ == "__main__":
     main()
