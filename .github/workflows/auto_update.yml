@@ -45,6 +45,9 @@ jobs:
       - name: 🏷️ Build Version Badge
         run: python scripts/make_version_badge.py
 
+      - name: 🧭 Build Freshness Badge
+        run: python scripts/make_freshness_badge.py
+
       - name: Validate CSVs
         run: python scripts/update_timeline.py --base .
 
@@ -61,11 +64,12 @@ jobs:
             data/summary/CHANGELOG_batches.csv
             data/summary/VERSION
             docs/badges/version.svg
+            docs/badges/freshness.svg
             data/master/
             data/unverified/
             data/archive/
             CHECKLIST.md
-          message: "chore(auto-update): merge + rebuild checklist & changelog + badge + validate"
+          message: "chore(auto-update): merge + rebuild checklist & changelog + badges + validate"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
