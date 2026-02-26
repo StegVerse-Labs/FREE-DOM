@@ -1,162 +1,91 @@
-# FREE-DOM Data Layer
+# FREE-DOM Data Layer (`/data`)
 
 This directory contains all structured datasets, ingestion inputs, automation outputs, and archival history for the FREE-DOM project.
 
-The data layer is intentionally isolated from documentation and scripts to ensure:
+The data layer is intentionally separated from documentation and scripts to keep ingestion:
+- deterministic,
+- auditable,
+- reproducible,
+- and bot-safe.
 
-- deterministic ingestion  
-- clean audit trails  
-- reproducible builds  
-- clear promotion boundaries (pending → verified)  
-- bot-safe operation  
-
----
-
-## 📂 Directory Structure
+## Canonical Structure
 ```
 data/
-master/              ← Canonical verified datasets
-pending/             ← Incoming CSV batches awaiting merge
-unverified/          ← Leads not yet verified
-sources/             ← Approved public RSS/news feeds
-logs/ai_agent/       ← Raw JSONL logs from agent sweeps
-summary/             ← Dashboards, metrics, VERSION, changelog batches
-archive/             ← Timestamped processed imports for audit traceability
+master/        # canonical, verified datasets
+pending/       # incoming batches awaiting merge
+unverified/    # leads / associations not yet verified
+sources/       # whitelisted public RSS/news feeds
+logs/          # AI agent run logs (append-only)
+summary/       # dashboards + VERSION + batch history
+archive/       # processed pending snapshots (audit trail)
 ```
 
-No data-bearing CSV files should exist at repository root.
+> **Rule:** No data-bearing CSV files should live at repository root.  
+> **Rule:** `data/` root should only contain subfolders + this README.
 
----
+## Folder Roles
 
-## 🧩 Folder Roles
-
-### `master/`
-Contains validated datasets such as:
-
+### `master/` (canonical)
+Verified datasets used for downstream outputs (edited only through automation):
 - `master_timeline.csv`
 - `verified_people_events.csv`
+- optional canonical registries (e.g., `organizations.csv`, `photo_video_anchors.csv`)
 
-These represent canonical structured data.  
-Modified only via automation.
+Managed by: **Auto Update**
 
-Managed by: **Auto Update workflow**
-
----
-
-### `pending/`
-Holds new CSV batches:
-
+### `pending/` (inputs)
+Incoming batch files to be merged:
 - `pending_updates_*.csv`
 - `pending_people_*.csv`
 - `pending_unverified_*.csv`
 
-Processed automatically and then archived.
+Managed by: **Human + Auto Update**  
+After processing, batches are moved into `archive/`.
 
-Managed by: **Human review + Auto Update workflow**
-
----
-
-### `unverified/`
-Tracks unconfirmed information:
-
+### `unverified/` (leads)
+Leads needing confirmation:
 - `unverified_events.csv`
 - `unverified_people.csv`
 - `unverified_connections.csv`
 
-Entries here are not treated as verified facts.
+Managed by: **Auto Update** (non-destructive)
 
-Managed by: **Auto Update workflow**
+### `sources/` (public whitelist)
+- `sources_whitelist.csv` — approved public RSS/news feeds
 
----
+Managed by: **Manual**
 
-### `sources/`
-Contains:
+### `logs/` (append-only)
+AI agent logs (e.g., `logs/ai_agent/agent_run_*.jsonl`) for transparency and audit.
 
-- `sources_whitelist.csv`
+Managed by: **AI Search Agent**
 
-Defines publicly accessible RSS/news feeds monitored by the AI Search Agent.
-
-Managed manually.
-
----
-
-### `logs/ai_agent/`
-Raw `.jsonl` logs of agent runs.  
-Provides transparency into:
-
-- keywords used  
-- links discovered  
-- source domains  
-- timestamps  
-
-Append-only.
-
-Managed by: **AI Search Agent workflow**
-
----
-
-### `summary/`
-Automatically generated artifacts:
-
+### `summary/` (dashboards)
+Generated artifacts used as “ops dashboards,” commonly:
 - `ai_agent_summary.csv`
 - `ai_agent_sources_index.csv`
-- `CHANGELOG_batches.csv`
 - `VERSION`
+- `CHANGELOG_batches.csv` (or similar batch history)
 
-Represents the operational dashboard layer.
+Managed by: **AI Search Agent + Auto Update**
 
-Managed by: **AI Search Agent + Auto Update workflows**
+### `archive/` (processed snapshots)
+Timestamped “processed batch” files preserved for audit traceability.
 
----
+Managed by: **Auto Update**
 
-### `archive/`
-Processed pending imports are moved here with timestamped filenames.
+## High-Level Flow
 
-Preserves:
+1. Drop new batches into `data/pending/`
+2. Auto Update merges into `data/master/` and updates checklists/changelog
+3. AI Search Agent scans whitelisted public sources and writes logs + summaries
+4. Items only “promote” from `unverified/` → `master/` via explicit verification
 
-- historical state  
-- import traceability  
-- audit history  
+## Governance Notes
 
-Managed by: **Auto Update workflow**
+- Public OSINT only (no private or non-public sources)
+- `unverified/` is explicitly non-canonical
+- `master/` is canonical and should remain reproducible
+- Automation should be idempotent (safe to re-run)
 
----
-
-## ⚙️ Automation Overview
-
-### AI Search Agent
-- Runs on schedule
-- Scans approved public sources
-- Appends non-destructive leads
-- Generates coverage summaries
-
-Script: `scripts/search_agent.py`
-
----
-
-### Auto Update
-- Merges pending batches into master
-- Rebuilds CHECKLIST.md
-- Updates CHANGELOG.md
-- Validates schema
-- Archives processed imports
-
-Scripts:
-- `import_pending.py`
-- `build_checklist.py`
-- `build_changelog.py`
-- `update_timeline.py`
-
----
-
-## 🔐 Governance Principles
-
-- Public OSINT sources only  
-- No private or non-public ingestion  
-- Unverified data remains segregated  
-- Promotion to `master/` is intentional and reviewable  
-- Automation is idempotent and safe to rerun  
-
----
-
-This directory is the canonical ingestion backbone of FREE-DOM.
+_Last updated via repo governance._
