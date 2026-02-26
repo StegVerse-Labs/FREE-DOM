@@ -34,7 +34,7 @@ jobs:
           pip install pandas
 
       - name: Merge pending (events + people + unverified)
-        run: python scripts/import_pending.py
+        run: python scripts/import_pending.py --base .
 
       - name: Build checklist
         run: python scripts/build_checklist.py
@@ -46,7 +46,7 @@ jobs:
         run: python scripts/make_version_badge.py
 
       - name: Validate CSVs
-        run: python scripts/update_timeline.py
+        run: python scripts/update_timeline.py --base .
 
       - name: Configure git user
         run: |
@@ -61,14 +61,11 @@ jobs:
             data/summary/CHANGELOG_batches.csv
             data/summary/VERSION
             docs/badges/version.svg
-            data/master/master_timeline.csv
-            data/master/verified_people_events.csv
-            data/unverified/unverified_events.csv
-            data/unverified/unverified_people.csv
-            data/unverified/unverified_connections.csv
+            data/master/
+            data/unverified/
             data/archive/
             CHECKLIST.md
-          message: "chore(auto-update): merge + rebuild checklist & changelog + version badge + validate"
+          message: "chore(auto-update): merge + rebuild checklist & changelog + badge + validate"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
