@@ -1,3 +1,36 @@
+# 🧾 FREE-DOM — CHANGELOG
+
+All notable changes are recorded by the `Auto Update` workflow.
+
+---
+
+## v8.1.2 — 2026-02-26
+**Commit:** `8845843` — Update and rename pending_unverified_template.csv to data/pending/pending_unverified_template.csv  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 22434351004)
+
+<details><summary>Changed files</summary>
+
+```txt
+data/pending/pending_unverified_template.csv
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1165 |
+| verified_people_events.csv | 2 |
+| unverified_events.csv | 1 |
+| unverified_people.csv | 1 |
+| unverified_connections.csv | 1 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 ## v8.1.1 — 2026-02-26
 **Commit:** `b90e23f` — Update and rename pending_updates_template.csv to data/pending/pending_updates_template.csv  
 **Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 22434327124)
