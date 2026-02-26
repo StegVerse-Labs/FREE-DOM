@@ -2,6 +2,8 @@
 
 ![Version](docs/badges/version.svg)
 
+![Freshness](docs/badges/freshness.svg)
+
 A public, evidence-first research repository designed to support fiction authors and investigative journalists by maintaining **structured, factual timelines** of publicly verifiable events, court dockets, and related data.
 
 ---
