@@ -1,0 +1,5 @@
+type,date,location,event,person,possible_event_date,alleged_association,entity_a,entity_b,connection_type,primary_source,secondary_source,source,confidence,notes,next_step
+event,2003-07-01,"London, UK",Private meeting at unnamed townhouse,,,,,,,single media mention,,,low,only one mention; no doc corroboration yet,seek second independent source
+person,,"London, UK",,John D.,2003-07-01,Met with group,,,,,,tabloid (unconfirmed),low,name appears once; no cross-source,cross-check dockets/flight logs
+connection,,,,,,,John D.,Private charter flight,travel_manifest_overlap,,,unverified manifest,medium,date overlap but names not confirmed,compare FAA or court exhibits
+
