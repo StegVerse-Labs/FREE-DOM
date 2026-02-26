@@ -11,6 +11,7 @@ on:
       - "scripts/build_ai_agent_summary.py"
       - "data/sources/**"
       - "data/pending/**"
+      - ".github/workflows/ai_search_agent.yml"
 
 permissions:
   contents: write
@@ -39,24 +40,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python scripts/search_agent.py
+          python scripts/search_agent.py --base .
+          python scripts/build_ai_agent_summary.py --base .
 
-      - name: Build AI Agent Summary
-        run: |
-          python scripts/build_ai_agent_summary.py
-
-      - name: Commit or PR (if changed)
+      - name: Commit (if changed)
         uses: EndBug/add-and-commit@v9
         with:
           add: |
-            data/master/master_timeline.csv
-            data/master/verified_people_events.csv
-            data/unverified/unverified_events.csv
-            data/unverified/unverified_people.csv
-            data/unverified/unverified_connections.csv
+            data/master/
+            data/unverified/
             data/logs/ai_agent/
-            data/summary/ai_agent_summary.csv
-            data/summary/ai_agent_sources_index.csv
-          message: "chore(ai-agent): update CSVs with public-source leads + summary"
+            data/summary/
+          message: "chore(ai-agent): update public-source leads + summary"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
