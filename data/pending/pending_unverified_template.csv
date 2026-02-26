@@ -1,4 +1,4 @@
 type,date,location,event,primary_source,secondary_source,confidence,notes,next_step,person,possible_event_date,alleged_association,source,entity_a,entity_b,connection_type
-event,2025-01-01,New York,Example unverified event,https://example.com/primary,https://example.com/secondary,0.40,"Unverified lead from public reporting",Verify via court docket,,,,,,
-person,,,,,,,,,John Doe,2025-01-01,New York,"Possible association described publicly",https://example.com/source,,,
+event,2025-01-01,New York,Example unverified event,https://example.com/primary,https://example.com/secondary,0.40,Unverified lead from public reporting,Verify via court docket,,,,,,
+person,,,,,,,,,John Doe,2025-01-01,New York,Possible association described publicly,https://example.com/source,,,
 connection,,,,,,,,,,,,https://example.com/source,Entity A,Entity B,financial
