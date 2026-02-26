@@ -1,4 +1,4 @@
 type,date,location,event,primary_source,secondary_source,person,possible_event_date,alleged_association,entity_a,entity_b,connection_type,source,confidence,notes,next_step
-event,2025-01-01,New York,Example Event,https://source1.com,https://source2.com,,,,,,,,0.50,Initial unverified report,Verify via secondary source
+event,2025-01-01,New York,Example Event,https://source1.com,https://source2.com,,,,,,,,,0.50,Initial unverified report,Verify via secondary source
 person,,,,,,John Doe,2025-01-01,Alleged participant,,,,https://source.com,0.40,Unverified association,Confirm via documentation
 connection,,,,,,,,,Entity A,Entity B,financial_link,https://source.com,0.60,Potential connection,Investigate filings
