@@ -1,1 +1,2 @@
 date,location,event,person,role,source_urls,deep_search_person,deep_search_notes
+2025-01-01,New York,Example event title,Person A,Role/Capacity,"https://example.com/source1 ; https://example.com/source2",pending,
