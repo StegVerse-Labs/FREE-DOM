@@ -1,2 +1,3 @@
 entity_a,entity_b,connection_type,source,confidence,notes,next_step
+Entity B,financial_link,https://source.com,0.60,Potential connection,Investigate filings,
 John D.,Private charter flight,travel_manifest_overlap,unverified manifest,medium,date overlap but names not confirmed,compare FAA or court exhibits
