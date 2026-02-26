@@ -1,3 +1,30 @@
+## v13.0.3 — 2026-02-26
+**Commit:** `937ef16` — Update pending_unverified_template.csv  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 22437664750)
+
+<details><summary>Changed files</summary>
+
+```txt
+data/pending/pending_unverified_template.csv
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1165 |
+| verified_people_events.csv | 2 |
+| unverified_events.csv | 4 |
+| unverified_people.csv | 3 |
+| unverified_connections.csv | 3 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 # 🧾 FREE-DOM — CHANGELOG
 
 All notable changes are recorded by the `Auto Update` workflow.

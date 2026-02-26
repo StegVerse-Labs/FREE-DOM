@@ -2,3 +2,4 @@ date,location,event,primary_source,secondary_source,confidence,notes,next_step
 2003-07-01,"London, UK",Private meeting at unnamed townhouse,single media mention,,low,only one mention; no doc corroboration yet,seek second independent source
 2025-01-01,New York,Example Event,https://source1.com,https://source2.com,Initial unverified report,Verify via secondary source,
 2025-01-01,New York,Example Event,https://source1.com,https://source2.com,0.50,Initial unverified report,Verify via secondary source
+2025-01-01,New York,Example Event,https://source1.com,https://source2.com,,0.50,Initial unverified report
