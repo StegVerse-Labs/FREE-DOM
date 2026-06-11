@@ -1,3 +1,38 @@
+# 🧾 FREE-DOM — CHANGELOG
+
+All notable changes are recorded by the `Auto Update` workflow.
+
+---
+
+## v14.0.0 — 2026-06-10
+**Commit:** `0c7e31d` — Add files via upload  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 27319603684)
+
+<details><summary>Changed files</summary>
+
+```txt
+scripts/import_pending.py
+scripts/make_freshness_badge.py
+scripts/search_agent.py
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1166 |
+| verified_people_events.csv | 3 |
+| unverified_events.csv | 5 |
+| unverified_people.csv | 4 |
+| unverified_connections.csv | 4 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 ## v13.1.0 — 2026-06-10
 **Commit:** `b1de72f` — Add files via upload  
 **Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 27319559443)
