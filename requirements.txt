@@ -1,0 +1,10 @@
+# FREE-DOM Python dependencies
+# Pinned to minimum compatible versions; tested on Python 3.11 (matches CI).
+
+# Data merge / validation pipeline (auto_update workflow)
+pandas>=2.0,<3.0
+
+# AI Search Agent — public OSINT sweep (ai_search_agent workflow)
+requests>=2.31,<3.0
+beautifulsoup4>=4.12,<5.0
+feedparser>=6.0,<7.0
