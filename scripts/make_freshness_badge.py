@@ -10,7 +10,7 @@ from __future__ import annotations
 import sys
 import csv
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[1]
 CSV_PATHS = [
@@ -61,8 +61,8 @@ def make_badge_svg(label: str, value: str) -> str:
     color = "#bdbdbd"
     if value != "unknown":
         try:
-            dt = datetime.strptime(value, "%Y-%m-%d")
-            days = (datetime.utcnow() - dt).days
+            dt = datetime.strptime(value, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            days = (datetime.now(timezone.utc) - dt).days
             if days <= 2:
                 color = "#2ca02c"
             elif days <= 7:

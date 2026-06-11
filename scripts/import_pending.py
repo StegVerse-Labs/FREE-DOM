@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import pathlib
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Iterable
 
 
@@ -330,7 +330,7 @@ def merge_unverified(DATA: pathlib.Path) -> list[pathlib.Path]:
 
 
 def archive_files(archive_dir: pathlib.Path, files: list[pathlib.Path]) -> None:
-    ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     archive_dir.mkdir(parents=True, exist_ok=True)
     for p in files:
         dest = archive_dir / f"{p.stem}.processed_{ts}{p.suffix}"

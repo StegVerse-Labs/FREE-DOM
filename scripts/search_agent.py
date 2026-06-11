@@ -13,7 +13,7 @@ Portable (supports --base):
 
 from __future__ import annotations
 import argparse, csv, re, json, pathlib, hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict
 
 import pandas as pd
@@ -102,7 +102,7 @@ def find_pending(df: pd.DataFrame, col: str) -> pd.DataFrame:
     return df[(df[col].fillna("").str.lower().isin(["", "pending"]))]
 
 def mk_log(log_dir: pathlib.Path) -> pathlib.Path:
-    ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     log_dir.mkdir(parents=True, exist_ok=True)
     return log_dir / f"agent_run_{ts}.jsonl"
 
