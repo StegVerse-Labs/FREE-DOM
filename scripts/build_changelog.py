@@ -19,7 +19,7 @@ SemVer rules (last commit diff vs HEAD~1):
 
 from __future__ import annotations
 import os, re, csv, subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any
 import pandas as pd
@@ -95,7 +95,7 @@ def read_rows(path: Path) -> int:
         return 0
 
 def now_utc() -> str:
-    return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 def git_ctx() -> Dict[str, Any]:
     return {
@@ -200,7 +200,7 @@ def main():
     if not ((df.get("commit_hash") == ctx["commit_hash"]).any()):
         row = {
             "version": version_str,
-            "ts_utc": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "ts_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             **ctx, **cnt
         }
         df = pd.concat([pd.DataFrame([row]), df], ignore_index=True)
