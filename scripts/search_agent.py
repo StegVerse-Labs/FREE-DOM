@@ -8,6 +8,7 @@ Portable (supports --base):
 - Crawls whitelisted sources (RSS & allowed pages)
 - Appends lead links into notes fields (non-destructive)
 - Emits ST-007 evidence manifests, transition receipts, and a run Merkle batch
+- Emits a bounded run receipt even when zero hits are found
 - Logs under <base>/data/logs/ai_agent/
 - NEVER accesses non-public or “dark web” content
 """
@@ -27,8 +28,9 @@ import requests
 from bs4 import BeautifulSoup
 
 from evidence_chain import persist_discovery, write_run_merkle_batch
+from search_run_evidence import persist_search_run
 
-USER_AGENT = "StegVerse-AI-Agent/1.1 (+public sources only; ST-007 receipts)"
+USER_AGENT = "StegVerse-AI-Agent/1.2 (+public sources only; ST-007 receipts)"
 SESSION = requests.Session()
 SESSION.headers.update({
     "User-Agent": USER_AGENT,
@@ -125,6 +127,10 @@ def make_run_id() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
+def iso_now() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
 def mk_log(log_dir: pathlib.Path, run_id: str) -> pathlib.Path:
     log_dir.mkdir(parents=True, exist_ok=True)
     return log_dir / f"agent_run_{run_id}.jsonl"
@@ -191,6 +197,7 @@ def main() -> None:
     parser.add_argument("--base", default=".", help="Scope base directory (repo root or nested scope folder)")
     args = parser.parse_args()
 
+    started_at = iso_now()
     base = pathlib.Path(args.base).resolve()
     data = base / "data"
     master_path = data / "master" / "master_timeline.csv"
@@ -268,15 +275,41 @@ def main() -> None:
     if not people.empty:
         write_csv(people_path, people)
 
-    batch_path = write_run_merkle_batch(base, run_id, receipt_refs)
     for failure in failures:
         log_line(log_path, {"type": "source-check-failure", **failure})
+
+    completed_at = iso_now()
+    run_ref = persist_search_run(
+        base=base,
+        run_id=run_id,
+        started_at=started_at,
+        completed_at=completed_at,
+        event_targets=len(pending_events),
+        person_targets=len(pending_people),
+        rss_sources=len(rss_feeds),
+        page_sources=len(site_pages),
+        total_hits=total_hits,
+        hit_receipts=len(receipt_refs),
+        failures=failures,
+        log_path=log_path,
+    )
+    receipt_refs.append(run_ref)
+    log_line(log_path, {"type": "search-run-evidence-receipt", **run_ref})
+
+    batch_path = write_run_merkle_batch(base, run_id, receipt_refs)
     log_line(log_path, {
         "summary": {
             "base": str(base),
             "run_id": run_id,
+            "started_at": started_at,
+            "completed_at": completed_at,
+            "pending_event_targets": len(pending_events),
+            "pending_person_targets": len(pending_people),
+            "rss_sources": len(rss_feeds),
+            "page_sources": len(site_pages),
             "total_hits": total_hits,
-            "evidence_receipts": len(receipt_refs),
+            "hit_evidence_receipts": len(receipt_refs) - 1,
+            "run_evidence_receipts": 1,
             "source_failures": len(failures),
             "merkle_batch": batch_path.relative_to(base).as_posix() if batch_path else None,
         }
