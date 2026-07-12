@@ -20,10 +20,13 @@ def load(path: pathlib.Path) -> dict[str, Any]:
     return data
 
 
-def canonical_hash(obj: dict[str, Any], hash_field: str) -> str:
-    payload = {k: v for k, v in obj.items() if k != hash_field}
-    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+def canonical_value_hash(value: Any) -> str:
+    raw = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return "sha256:" + hashlib.sha256(raw).hexdigest()
+
+
+def canonical_hash(obj: dict[str, Any], hash_field: str) -> str:
+    return canonical_value_hash({k: v for k, v in obj.items() if k != hash_field})
 
 
 def require_hash(value: Any, label: str, nullable: bool = False) -> None:
@@ -62,10 +65,12 @@ def apply_proof(receipt_hash: str, siblings: list[dict[str, str]]) -> str:
 
 def validate(base: pathlib.Path) -> tuple[int, int, int, int]:
     root = base / "data" / "evidence"
+    artifacts_dir = root / "artifacts"
     manifests_dir, receipts_dir = root / "manifests", root / "receipts"
     batches_dir, proofs_dir = root / "merkle", root / "proofs"
     manifests: dict[str, dict[str, Any]] = {}
     receipts: dict[str, dict[str, Any]] = {}
+    receipt_ids: set[str] = set()
 
     for path in sorted(manifests_dir.glob("*.json")) if manifests_dir.exists() else []:
         obj = load(path)
@@ -73,10 +78,21 @@ def validate(base: pathlib.Path) -> tuple[int, int, int, int]:
             raise ValueError(f"{path}: unsupported manifest_version")
         if obj.get("manifest_hash") != canonical_hash(obj, "manifest_hash"):
             raise ValueError(f"{path}: manifest_hash mismatch")
-        require_hash(obj.get("artifact", {}).get("content_hash"), f"{path}: artifact.content_hash")
         evidence_id = obj.get("evidence_id")
         if not evidence_id or evidence_id in manifests:
             raise ValueError(f"{path}: missing or duplicate evidence_id")
+        artifact_path = artifacts_dir / f"{evidence_id}.json"
+        if not artifact_path.exists():
+            raise ValueError(f"{path}: retained artifact missing")
+        artifact = load(artifact_path)
+        artifact_hash = obj.get("artifact", {}).get("content_hash")
+        require_hash(artifact_hash, f"{path}: artifact.content_hash")
+        if artifact_hash != canonical_value_hash(artifact):
+            raise ValueError(f"{path}: artifact.content_hash mismatch")
+        declared_size = obj.get("artifact", {}).get("size_bytes")
+        actual_size = len(json.dumps(artifact, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+        if declared_size is not None and declared_size != actual_size:
+            raise ValueError(f"{path}: artifact.size_bytes mismatch")
         manifests[evidence_id] = obj
 
     for path in sorted(receipts_dir.glob("*.json")) if receipts_dir.exists() else []:
@@ -85,16 +101,24 @@ def validate(base: pathlib.Path) -> tuple[int, int, int, int]:
             raise ValueError(f"{path}: unsupported receipt_version")
         if obj.get("receipt_hash") != canonical_hash(obj, "receipt_hash"):
             raise ValueError(f"{path}: receipt_hash mismatch")
-        receipt_hash = obj.get("receipt_hash")
+        receipt_hash, receipt_id = obj.get("receipt_hash"), obj.get("receipt_id")
         require_hash(receipt_hash, f"{path}: receipt_hash")
-        if receipt_hash in receipts:
-            raise ValueError(f"{path}: duplicate receipt_hash")
+        if receipt_hash in receipts or not receipt_id or receipt_id in receipt_ids:
+            raise ValueError(f"{path}: duplicate or missing receipt identity")
         manifest = manifests.get(obj.get("evidence_id"))
         if manifest is None or obj.get("manifest_hash") != manifest.get("manifest_hash"):
             raise ValueError(f"{path}: receipt manifest binding invalid")
         if obj.get("authority_class") != "observe" or obj.get("evidence_effect") != "discovery-only":
-            raise ValueError(f"{path}: FREE-DOM discovery receipt exceeds authority")
+            raise ValueError(f"{path}: FREE-DOM receipt exceeds authority")
+        if obj.get("transition_type") not in {"discovered", "captured"}:
+            raise ValueError(f"{path}: unsupported FREE-DOM transition type")
+        if obj.get("transition_type") == "captured" and "zero-hits-not-absence-proof" not in obj.get("reason_codes", []) and obj.get("result") == "RECORDED":
+            standing = obj.get("standing") or {}
+            excluded = standing.get("excluded_inferences", [])
+            if not any("absence" in str(item).lower() for item in excluded):
+                raise ValueError(f"{path}: run receipt does not exclude absence inference")
         receipts[receipt_hash] = obj
+        receipt_ids.add(receipt_id)
 
     batches: list[tuple[pathlib.Path, dict[str, Any]]] = []
     for path in sorted(batches_dir.glob("*.json")) if batches_dir.exists() else []:
@@ -112,6 +136,9 @@ def validate(base: pathlib.Path) -> tuple[int, int, int, int]:
             require_hash(leaf, f"{path}: leaf")
             if leaf not in receipts:
                 raise ValueError(f"{path}: unknown receipt leaf {leaf}")
+        expected = [r["receipt_hash"] for r in sorted((receipts[h] for h in leaves), key=lambda item: item["receipt_id"])]
+        if leaves != expected:
+            raise ValueError(f"{path}: Merkle leaves not ordered by receipt_id")
         if obj.get("merkle_root") != calculate_merkle_root(leaves):
             raise ValueError(f"{path}: Merkle root mismatch")
         require_hash(obj.get("previous_batch_hash"), f"{path}: previous_batch_hash", nullable=True)
@@ -124,6 +151,7 @@ def validate(base: pathlib.Path) -> tuple[int, int, int, int]:
             raise ValueError(f"{path}: previous_batch_hash does not match prior batch")
 
     proof_count = 0
+    seen_proofs: set[tuple[str, str]] = set()
     batch_by_id = {obj.get("batch_id"): obj for _, obj in batches}
     for path in sorted(proofs_dir.rglob("*.json")) if proofs_dir.exists() else []:
         proof = load(path)
@@ -137,9 +165,17 @@ def validate(base: pathlib.Path) -> tuple[int, int, int, int]:
         receipt_hash = proof.get("receipt_hash")
         if receipt_hash not in receipts or receipt_hash not in batch.get("leaf_receipt_hashes", []):
             raise ValueError(f"{path}: proof receipt binding invalid")
+        index = proof.get("leaf_index")
+        leaves = batch.get("leaf_receipt_hashes", [])
+        if not isinstance(index, int) or index < 0 or index >= len(leaves) or leaves[index] != receipt_hash:
+            raise ValueError(f"{path}: invalid leaf_index")
         siblings = proof.get("siblings")
         if not isinstance(siblings, list) or apply_proof(receipt_hash, siblings) != batch.get("merkle_root"):
             raise ValueError(f"{path}: inclusion proof does not resolve to batch root")
+        key = (proof.get("batch_id"), receipt_hash)
+        if key in seen_proofs:
+            raise ValueError(f"{path}: duplicate inclusion proof")
+        seen_proofs.add(key)
         proof_count += 1
 
     expected_proofs = sum(len(obj.get("leaf_receipt_hashes", [])) for _, obj in batches)
