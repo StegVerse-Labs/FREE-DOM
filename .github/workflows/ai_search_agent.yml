@@ -55,14 +55,24 @@ jobs:
           python scripts/search_agent.py --base .
           python scripts/build_ai_agent_summary.py --base .
 
+      - name: Enforce canonical master immutability
+        shell: bash
+        run: |
+          if ! git diff --quiet -- data/master/; then
+            echo "NOTICE: AI Search Agent attempted to modify canonical master records."
+            echo "NOTICE: Restoring data/master; unverified discoveries remain in governed evidence outputs only."
+            git diff -- data/master/
+            git restore --worktree --source=HEAD -- data/master/
+          fi
+          git diff --exit-code -- data/master/
+
       - name: Validate portable evidence outputs
         run: python scripts/validate_evidence_outputs.py --base .
 
-      - name: Commit (if changed)
+      - name: Commit governed evidence outputs (if changed)
         uses: EndBug/add-and-commit@v9
         with:
           add: |
-            data/master/
             data/unverified/
             data/logs/ai_agent/
             data/summary/
