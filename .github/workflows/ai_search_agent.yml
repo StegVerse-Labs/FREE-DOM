@@ -8,6 +8,8 @@ on:
     branches: [ "main" ]
     paths:
       - "scripts/search_agent.py"
+      - "scripts/evidence_chain.py"
+      - "scripts/validate_evidence_outputs.py"
       - "scripts/build_ai_agent_summary.py"
       - "data/sources/**"
       - "data/pending/**"
@@ -16,6 +18,10 @@ on:
 permissions:
   contents: write
   pull-requests: write
+
+concurrency:
+  group: freedom-ai-search-agent
+  cancel-in-progress: false
 
 jobs:
   sweep:
@@ -43,6 +49,9 @@ jobs:
           python scripts/search_agent.py --base .
           python scripts/build_ai_agent_summary.py --base .
 
+      - name: Validate portable evidence outputs
+        run: python scripts/validate_evidence_outputs.py --base .
+
       - name: Commit (if changed)
         uses: EndBug/add-and-commit@v9
         with:
@@ -51,6 +60,7 @@ jobs:
             data/unverified/
             data/logs/ai_agent/
             data/summary/
-          message: "chore(ai-agent): update public-source leads + summary"
+            data/evidence/
+          message: "chore(ai-agent): update public-source leads + governed evidence receipts"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
