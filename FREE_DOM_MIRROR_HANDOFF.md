@@ -52,6 +52,8 @@ PUBLIC_EVIDENCE_ONLY_BOUNDARY_DECLARED
 SENSITIVE_INFORMATION_PUBLICATION_PROHIBITED
 WORKFLOW_INVENTORY_RECORDED
 CURRENT_MAIN_WORKFLOW_VERIFICATION_PENDING
+AI_SEARCH_SWEEP_RUNTIME_BOUND_INSTALLED
+AI_SEARCH_SWEEP_REPAIR_VERIFICATION_PENDING
 CROSS_REPOSITORY_FORWARDING_AUTHORITY_NOT_INFERRED
 AUTOMATED_MASTER_PROMOTION_AUTHORITY_NOT_INFERRED
 RELEASE_AND_DEPLOYMENT_AUTHORITY_NOT_GRANTED
@@ -118,16 +120,35 @@ public outputs preserve source attribution, uncertainty, privacy, and non-implic
 passing run identifiers and commit SHA are recorded in this handoff
 ```
 
+## Latest handled event
+
+```text
+Notification timestamp: 2026-07-12T01:34:53-05:00
+Repository: StegVerse-Labs/FREE-DOM
+Branch: main
+Workflow: AI Search Agent (Public OSINT Sweep)
+Job: sweep
+Run ID: 29176837511
+Commit: e875c82
+Failure class: workflow runtime failure after 4 hours, 5 minutes, 1 second
+Annotations: 3; annotation text unavailable through the notification payload
+Bounded repair: added job-level timeout-minutes: 30 to fail closed instead of permitting multi-hour execution
+Repair commit: 1e25e3335bf9e12edba5b020a41169aa5867f69d
+Verification: pending a subsequent workflow run on the repair commit or later
+Authority preserved: no source scope change, no record promotion, no external forwarding, no credential change, no release, no deployment, no tag, no merge
+```
+
+The workflow still includes `data/master/` in its commit surface. That is not treated as authority to promote or reclassify records, and the current phase cannot be declared complete until the review-gate condition is verified explicitly.
+
 ## Next task
 
 ```text
-1. Correlate the newest unread GitHub failure or progress notification to its exact FREE-DOM workflow run and current-main commit.
-2. Inspect the failing job, step, logs, and artifact evidence.
-3. Determine whether the failure is repository-local and covered by Permitted bounded maintenance.
-4. Apply only the smallest non-destructive repair when authorized.
-5. Verify the repaired workflow or test on the repair commit or later.
-6. Record the run ID, job, commit SHA, repair commit, result, and next task in this handoff.
-7. Stop before any record promotion, external forwarding, credential use, publication expansion, release, deployment, tag, or cross-repository mutation unless separately authorized.
+1. Verify the next AI Search Agent run on commit 1e25e3335bf9e12edba5b020a41169aa5867f69d or later finishes within the 30-minute bound.
+2. Inspect annotation and job-log evidence if the run still fails.
+3. Verify that the workflow's writes to data/master/ cannot promote or reclassify unverified material without a declared review gate.
+4. Run or verify repository-local readiness and evidence-output tests on the same current-main commit.
+5. Record passing run identifiers and commit SHA here only when all completion conditions are satisfied.
+6. Stop before record promotion, external forwarding, credential use, publication expansion, release, deployment, tag, merge, or cross-repository mutation unless separately authorized.
 ```
 
 ## Evidence to preserve
@@ -147,4 +168,4 @@ remaining blocker or next declared task
 
 ## Archive readiness
 
-This handoff records the repository purpose, workflow inventory, evidence and privacy boundaries, permitted maintenance scope, completion conditions, and exact continuation order. Earlier conversation context is not required to begin bounded repository-local diagnosis.
+This handoff records the repository purpose, workflow inventory, evidence and privacy boundaries, permitted maintenance scope, completion conditions, latest bounded repair, and exact continuation order. Earlier conversation context is not required to begin bounded repository-local diagnosis.
