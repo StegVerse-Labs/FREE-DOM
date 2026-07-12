@@ -1,0 +1,13 @@
+{
+  "activation_type": "workflow-push-trigger",
+  "workflow": ".github/workflows/ai_search_agent.yml",
+  "requested_at": "2026-07-11T22:00:00-05:00",
+  "requested_by": "ChatGPT on behalf of repository owner",
+  "authority_effect": "none",
+  "standing_effect": "none",
+  "purpose": "Activate the existing AI Search Agent workflow through its declared data/sources push trigger.",
+  "notes": [
+    "This file does not modify the source whitelist or search targets.",
+    "This activation request is an operational trigger receipt, not evidence about any subject."
+  ]
+}
