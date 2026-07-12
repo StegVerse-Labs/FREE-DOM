@@ -1,3 +1,30 @@
+## v20.1.0 — 2026-07-11
+**Commit:** `aff671a` — chore(workflow): activate AI Search Agent through declared push trigger  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 29179043522)
+
+<details><summary>Changed files</summary>
+
+```txt
+data/sources/workflow_activation_20260711T220000Z.json
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1166 |
+| verified_people_events.csv | 3 |
+| unverified_events.csv | 5 |
+| unverified_people.csv | 4 |
+| unverified_connections.csv | 4 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 # 🧾 FREE-DOM — CHANGELOG
 
 All notable changes are recorded by the `Auto Update` workflow.
