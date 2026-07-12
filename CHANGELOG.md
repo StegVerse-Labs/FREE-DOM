@@ -1,3 +1,36 @@
+# 🧾 FREE-DOM — CHANGELOG
+
+All notable changes are recorded by the `Auto Update` workflow.
+
+---
+
+## v23.0.0 — 2026-07-12
+**Commit:** `f70b502` — fix(ci): fail closed without TV or master promotion authority  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 29206534584)
+
+<details><summary>Changed files</summary>
+
+```txt
+.github/workflows/auto_update_tv_patch.yml
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1166 |
+| verified_people_events.csv | 3 |
+| unverified_events.csv | 5 |
+| unverified_people.csv | 4 |
+| unverified_connections.csv | 4 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 ## v22.0.0 — 2026-07-12
 **Commit:** `38e15ac` — fix(ai-agent): prevent automated master-record mutation  
 **Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 29206257934)
