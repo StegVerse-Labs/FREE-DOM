@@ -9,6 +9,7 @@ on:
     paths:
       - "scripts/search_agent.py"
       - "scripts/evidence_chain.py"
+      - "scripts/search_run_evidence.py"
       - "scripts/validate_evidence_outputs.py"
       - "scripts/build_ai_agent_summary.py"
       - "data/sources/**"
