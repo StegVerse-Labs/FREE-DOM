@@ -38,6 +38,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas beautifulsoup4 feedparser requests
 
+      - name: Validate pending-import governance
+        run: python scripts/test_import_pending_governance.py
+
       - name: Validate zero-hit evidence path
         run: python scripts/test_search_run_evidence.py
 
