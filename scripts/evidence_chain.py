@@ -28,12 +28,7 @@ def utc_now() -> str:
 
 
 def canonical_bytes(value: Any) -> bytes:
-    return json.dumps(
-        value,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
 def sha256_value(value: Any) -> str:
@@ -73,7 +68,6 @@ def make_manifest(
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     link = str(hit.get("link") or "").strip()
     title = str(hit.get("title") or "").strip()
-    published = str(hit.get("published") or "").strip() or None
     discovery_artifact = {
         "target_type": target_type,
         "target_label": target_label,
@@ -139,7 +133,7 @@ def make_manifest(
         "supersedes_manifest_id": None,
         "manifest_hash": "",
     }
-    manifest["manifest_hash"] = sha256_value({k: v for k, v in manifest.items() if k != "manifest_hash"})
+    manifest["manifest_hash"] = sha256_value({key: value for key, value in manifest.items() if key != "manifest_hash"})
     return manifest, discovery_artifact
 
 
@@ -150,36 +144,42 @@ def make_discovery_receipt(manifest: dict[str, Any], occurred_at: str) -> dict[s
         "evidence_id": manifest["evidence_id"],
         "manifest_hash": manifest["manifest_hash"],
         "producer_node_id": "StegVerse-Labs/FREE-DOM",
-        "actor": {
-            "actor_id": "github-actions:FREE-DOM-ai-search-agent",
-            "authority_class": "discovery-only",
-        },
+        "actor": "github-actions:FREE-DOM-ai-search-agent",
+        "authority_class": "observe",
         "transition_type": "discovered",
         "occurred_at": occurred_at,
+        "effective_at": occurred_at,
         "policy_ref": POLICY_REF,
         "input_state": "not-recorded",
         "output_state": "discovered-unreviewed",
-        "result": "ALLOW",
-        "evidence_effect": "none-until-governed-review",
-        "current_standing": "unreviewed",
-        "counterevidence_refs": [],
-        "excluded_inferences": [
-            "underlying claim truth",
-            "identity confirmation beyond target label",
-            "association culpability",
-            "victim contact",
-            "criminal knowledge or participation",
-        ],
+        "result": "RECORDED",
+        "reason_codes": ["public-osint-hit", "governed-review-required"],
+        "evidence_effect": "discovery-only",
+        "standing": {
+            "status": "unreviewed",
+            "as_of": occurred_at,
+            "basis_receipt_ids": [],
+            "counterevidence_receipt_ids": [],
+            "unresolved_questions": ["Whether the linked source supports any material claim."],
+            "excluded_inferences": [
+                "underlying claim truth",
+                "identity confirmation beyond target label",
+                "association culpability",
+                "victim contact",
+                "criminal knowledge or participation",
+            ],
+        },
         "acknowledgment": {
-            "required": True,
+            "destination_node_id": "unassigned-governed-consumer",
             "status": "pending",
-            "consumer": None,
+            "acknowledgment_id": None,
         },
         "previous_receipt_hash": None,
         "supersedes_receipt_id": None,
         "receipt_hash": "",
+        "signature": None,
     }
-    receipt["receipt_hash"] = sha256_value({k: v for k, v in receipt.items() if k != "receipt_hash"})
+    receipt["receipt_hash"] = sha256_value({key: value for key, value in receipt.items() if key != "receipt_hash"})
     return receipt
 
 
@@ -190,10 +190,7 @@ def calculate_merkle_root(hashes: list[str]) -> str:
     while len(level) > 1:
         if len(level) % 2:
             level.append(level[-1])
-        level = [
-            hashlib.sha256(level[index] + level[index + 1]).digest()
-            for index in range(0, len(level), 2)
-        ]
+        level = [hashlib.sha256(level[index] + level[index + 1]).digest() for index in range(0, len(level), 2)]
     return "sha256:" + level[0].hex()
 
 
@@ -209,7 +206,6 @@ def persist_discovery(
     captured_at: str | None = None,
 ) -> dict[str, str]:
     captured_at = captured_at or utc_now()
-    executed_commit = os.environ.get("GITHUB_SHA") or None
     manifest, artifact = make_manifest(
         hit=hit,
         target_type=target_type,
@@ -218,7 +214,7 @@ def persist_discovery(
         keywords=keywords,
         captured_at=captured_at,
         run_id=run_id,
-        executed_commit=executed_commit,
+        executed_commit=os.environ.get("GITHUB_SHA") or None,
     )
     receipt = make_discovery_receipt(manifest, captured_at)
 
@@ -255,14 +251,15 @@ def write_run_merkle_batch(base: pathlib.Path, run_id: str, receipt_refs: list[d
         "producer_node_id": "StegVerse-Labs/FREE-DOM",
         "created_at": created_at,
         "hash_algorithm": "sha256",
+        "leaf_order": "lexicographic-receipt-id",
         "leaf_receipt_hashes": leaves,
         "merkle_root": calculate_merkle_root(leaves),
         "previous_batch_hash": None,
         "checkpoint_ref": None,
-        "signature": None,
         "batch_hash": "",
+        "signature": None,
     }
-    batch["batch_hash"] = sha256_value({k: v for k, v in batch.items() if k != "batch_hash"})
+    batch["batch_hash"] = sha256_value({key: value for key, value in batch.items() if key != "batch_hash"})
     path = base / "data" / "evidence" / "merkle" / f"{safe_slug(run_id, 64)}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(batch, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
