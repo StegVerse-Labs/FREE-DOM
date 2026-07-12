@@ -1,3 +1,36 @@
+# 🧾 FREE-DOM — CHANGELOG
+
+All notable changes are recorded by the `Auto Update` workflow.
+
+---
+
+## v17.0.0 — 2026-07-11
+**Commit:** `519ce97` — ci(evidence): validate and persist portable evidence chain outputs  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 29176872699)
+
+<details><summary>Changed files</summary>
+
+```txt
+.github/workflows/ai_search_agent.yml
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1166 |
+| verified_people_events.csv | 3 |
+| unverified_events.csv | 5 |
+| unverified_people.csv | 4 |
+| unverified_connections.csv | 4 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 ## v16.1.0 — 2026-07-11
 **Commit:** `88c4e49` — fix(evidence): conform FREE-DOM receipts to canonical ST-007 schemas  
 **Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 29176855238)
