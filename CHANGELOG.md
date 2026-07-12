@@ -1,3 +1,36 @@
+# 🧾 FREE-DOM — CHANGELOG
+
+All notable changes are recorded by the `Auto Update` workflow.
+
+---
+
+## v18.0.0 — 2026-07-11
+**Commit:** `d77c18d` — feat(evidence): receipt and Merkle-anchor every OSINT sweep  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 29178252035)
+
+<details><summary>Changed files</summary>
+
+```txt
+scripts/search_agent.py
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1166 |
+| verified_people_events.csv | 3 |
+| unverified_events.csv | 5 |
+| unverified_people.csv | 4 |
+| unverified_connections.csv | 4 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 ## v17.3.0 — 2026-07-11
 **Commit:** `6b160f9` — feat(evidence): preserve every OSINT sweep as reconstructable run evidence  
 **Author:** StegVerse  **Branch:** `main`  **Workflow:** `Merge Pending, Build Checklist & Changelog, Validate` (run 29178238147)
