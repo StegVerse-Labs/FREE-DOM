@@ -4,8 +4,6 @@
 
 This file is the current repository-local handoff and task source of truth for `StegVerse-Labs/FREE-DOM`.
 
-It was created after a cross-repository handoff scan found no existing `*_MIRROR_HANDOFF.md` in this repository.
-
 ## Repository purpose
 
 ```text
@@ -30,8 +28,6 @@ data/archive/     processed snapshots retained for audit
 
 ## Current workflow surface
 
-The following workflow files are present and must be evaluated independently:
-
 ```text
 .github/workflows/ai_search_agent.yml
 .github/workflows/auto_update.yml
@@ -51,11 +47,12 @@ REPOSITORY_PURPOSE_DECLARED
 PUBLIC_EVIDENCE_ONLY_BOUNDARY_DECLARED
 SENSITIVE_INFORMATION_PUBLICATION_PROHIBITED
 WORKFLOW_INVENTORY_RECORDED
-CURRENT_MAIN_WORKFLOW_VERIFICATION_PENDING
 AI_SEARCH_SWEEP_RUNTIME_BOUND_INSTALLED
+AI_SEARCH_CANONICAL_IMMUTABILITY_GATE_INSTALLED
 AI_SEARCH_SWEEP_REPAIR_VERIFICATION_PENDING
+CURRENT_MAIN_WORKFLOW_VERIFICATION_PENDING
 CROSS_REPOSITORY_FORWARDING_AUTHORITY_NOT_INFERRED
-AUTOMATED_MASTER_PROMOTION_AUTHORITY_NOT_INFERRED
+AUTOMATED_MASTER_PROMOTION_AUTHORITY_NOT_GRANTED
 RELEASE_AND_DEPLOYMENT_AUTHORITY_NOT_GRANTED
 ```
 
@@ -75,8 +72,6 @@ No release, deployment, tag, merge, external notification, referral, or public a
 ```
 
 ## Permitted bounded maintenance
-
-The following repository-local actions are permitted when directly required by a verified failure and when they preserve the boundaries above:
 
 ```text
 repair syntax errors
@@ -113,6 +108,7 @@ all workflow YAML parses successfully
 all repository-local tests and readiness checks pass
 workflow references resolve to existing files
 master, pending, unverified, and archive boundaries remain explicit
+no automated path persists changes to data/master/
 no automated path promotes unverified material to master without a declared review gate
 no workflow silently requires unavailable secrets
 cross-repository jobs fail closed when destination authority or credentials are unavailable
@@ -120,7 +116,9 @@ public outputs preserve source attribution, uncertainty, privacy, and non-implic
 passing run identifiers and commit SHA are recorded in this handoff
 ```
 
-## Latest handled event
+## Latest handled events
+
+### Runtime-bound repair
 
 ```text
 Notification timestamp: 2026-07-12T01:34:53-05:00
@@ -131,41 +129,64 @@ Job: sweep
 Run ID: 29176837511
 Commit: e875c82
 Failure class: workflow runtime failure after 4 hours, 5 minutes, 1 second
-Annotations: 3; annotation text unavailable through the notification payload
-Bounded repair: added job-level timeout-minutes: 30 to fail closed instead of permitting multi-hour execution
+Bounded repair: job-level timeout-minutes: 30
 Repair commit: 1e25e3335bf9e12edba5b020a41169aa5867f69d
-Verification: pending a subsequent workflow run on the repair commit or later
-Authority preserved: no source scope change, no record promotion, no external forwarding, no credential change, no release, no deployment, no tag, no merge
+Verification: pending
 ```
 
-The workflow still includes `data/master/` in its commit surface. That is not treated as authority to promote or reclassify records, and the current phase cannot be declared complete until the review-gate condition is verified explicitly.
+### Canonical immutability repair
+
+```text
+Finding: scripts/search_agent.py reads canonical records and may append discovered lead URLs to data/master notes in the workflow workspace.
+Risk: unverified discovery could enter the canonical commit surface without a declared review gate.
+Repair: remove data/master/ from the add-and-commit surface; restore any workspace mutation before commit; assert data/master/ is clean before evidence validation and commit.
+Repair commit: 38e15acaa90ac7b0adc0c8d21e5e7e1c66502d6b
+Preserved outputs: data/unverified/, data/logs/ai_agent/, data/summary/, data/evidence/
+Authority preserved: no source-scope expansion, record promotion, external forwarding, credential change, release, deployment, tag, or merge.
+Verification: pending a subsequent AI Search Agent run on this commit or later.
+```
 
 ## Next task
 
 ```text
-1. Verify the next AI Search Agent run on commit 1e25e3335bf9e12edba5b020a41169aa5867f69d or later finishes within the 30-minute bound.
-2. Inspect annotation and job-log evidence if the run still fails.
-3. Verify that the workflow's writes to data/master/ cannot promote or reclassify unverified material without a declared review gate.
-4. Run or verify repository-local readiness and evidence-output tests on the same current-main commit.
-5. Record passing run identifiers and commit SHA here only when all completion conditions are satisfied.
-6. Stop before record promotion, external forwarding, credential use, publication expansion, release, deployment, tag, merge, or cross-repository mutation unless separately authorized.
+1. Verify the AI Search Agent run on commit 38e15acaa90ac7b0adc0c8d21e5e7e1c66502d6b or later finishes within 30 minutes.
+2. Confirm the canonical immutability step restores and rejects any remaining data/master/ diff.
+3. Inspect job logs and annotations if the run fails.
+4. Confirm governed evidence outputs are committed while data/master/ remains unchanged.
+5. Run or verify repository-local readiness and evidence-output tests on the same current-main commit.
+6. Record the passing run ID, output commit, artifact paths, and commit SHA here only when all completion conditions are satisfied.
+7. Stop before record promotion, external forwarding, credential use, publication expansion, release, deployment, tag, merge, or cross-repository mutation unless separately authorized.
+```
+
+## Known remaining files or modules
+
+```text
+StegVerse-Labs/FREE-DOM/scripts/search_agent.py
+  Remaining improvement: refactor discovery handling so the script never mutates canonical DataFrames, even transiently.
+  Current protection: workflow restores data/master/ before validation and commit.
+
+StegVerse-Labs/FREE-DOM/.github/workflows/ai_search_agent.yml
+  Remaining verification: successful bounded run with governed evidence output commit and clean canonical diff.
+
+StegVerse-Labs/FREE-DOM/FREE_DOM_MIRROR_HANDOFF.md
+  Remaining update: record verified run, artifacts, and final current-main conclusion.
 ```
 
 ## Evidence to preserve
 
 ```text
-notification subject and timestamp
-repository and branch or pull request
 workflow run ID
 job and first failing step
 commit SHA
 failure classification
 relevant logs or artifact digest
-repair commit SHA, when applicable
+repair commit SHA
 verification run and conclusion
+governed evidence output commit
+evidence manifest, receipt, Merkle batch, log, and summary paths
 remaining blocker or next declared task
 ```
 
 ## Archive readiness
 
-This handoff records the repository purpose, workflow inventory, evidence and privacy boundaries, permitted maintenance scope, completion conditions, latest bounded repair, and exact continuation order. Earlier conversation context is not required to begin bounded repository-local diagnosis.
+This handoff records the repository purpose, workflow inventory, evidence and privacy boundaries, bounded runtime repair, canonical immutability repair, completion conditions, and exact continuation order. Earlier conversation context is not required to continue repository-local verification.
