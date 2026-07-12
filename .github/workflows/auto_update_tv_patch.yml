@@ -1,4 +1,4 @@
-name: Auto Update (with TV)
+name: Auto Update (Governed Local Validation)
 
 on:
   push:
@@ -6,70 +6,63 @@ on:
     paths:
       - "data/**"
       - "scripts/**"
-      - ".github/workflows/**"
+      - ".github/workflows/auto_update_tv_patch.yml"
   workflow_dispatch: {}
 
 permissions:
   contents: write
-  id-token: write
+
+concurrency:
+  group: freedom-governed-local-validation
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install system deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-
       - name: Install Python deps
         run: |
           python -m pip install --upgrade pip
-          pip install requests pandas
+          pip install requests pandas beautifulsoup4 feedparser
 
-      - name: Fetch short-lived secrets from TV
+      - name: Record canonical baseline
+        run: git diff --no-ext-diff --binary HEAD -- data/master/ > /tmp/master-before.patch
+
+      - name: Run repository-local evidence tests
         run: |
-          python scripts/tv_fetch.py \
-            --tv-url https://StegVerse-Labs/TV \
-            --role free-dom/ci/auto-update \
-            --aud stegverse-tv \
-            --keys secure_submission_url,private_store_endpoint,osint/* \
-            --out /tmp/tv.json
+          python scripts/test_search_run_evidence.py
+          python scripts/validate_evidence_outputs.py --base .
 
-      - name: Mask values in logs (defensive)
+      - name: Build non-canonical summaries
         run: |
-          if [ -f /tmp/tv.json ]; then
-            for val in $(jq -r '.[]? // empty' /tmp/tv.json); do
-              if [ -n "$val" ]; then
-                echo "::add-mask::$val"
-              fi
-            done
-          fi
-          echo "TV values acquired. (Secrets masked.)"
-
-      - name: Build Version Badge
-        run: python scripts/make_version_badge.py
-
-      - name: Build Freshness Badge
-        run: python scripts/make_freshness_badge.py
-
-      - name: Merge pending + validate
-        run: |
-          python scripts/import_pending.py
+          python scripts/make_version_badge.py
+          python scripts/make_freshness_badge.py
           python scripts/build_checklist.py
           python scripts/build_changelog.py
-          python scripts/update_timeline.py
 
-      - name: Commit artifacts (if changed)
+      - name: Enforce canonical immutability
+        run: |
+          git restore --source=HEAD --staged --worktree -- data/master/
+          if ! git diff --quiet -- data/master/; then
+            echo "::error::Governed local validation attempted to mutate data/master/."
+            exit 1
+          fi
+          git diff --no-ext-diff --binary HEAD -- data/master/ > /tmp/master-after.patch
+          cmp /tmp/master-before.patch /tmp/master-after.patch
+
+      - name: Commit governed local artifacts if changed
         uses: EndBug/add-and-commit@v9
         with:
           add: |
@@ -77,14 +70,11 @@ jobs:
             CHECKLIST.md
             data/summary/**
             docs/badges/**
-            data/master/**
             data/unverified/**
             data/archive/**
-          message: "chore(auto-update): merge + rebuild + badges + validate"
+            data/evidence/**
+            data/logs/ai_agent/**
+          message: "chore(auto-update): rebuild governed local artifacts"
           default_author: github_actions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Cleanup secret file
-        if: always()
-        run: rm -f /tmp/tv.json
