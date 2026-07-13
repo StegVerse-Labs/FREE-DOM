@@ -38,6 +38,7 @@ FAILURE_RECEIPT_PERSISTENCE_INSTALLED
 WORKFLOW_ARTIFACT_UPLOAD_ALWAYS_INSTALLED
 LOCAL_VALIDATION_ARTIFACT_ONLY_INSTALLED
 AI_SEARCH_SINGLE_WRITER_INSTALLED
+AI_SEARCH_PRECOMMIT_REBASE_INSTALLED
 DUPLICATE_VALIDATION_WORKFLOW_RETIRED
 AI_SEARCH_VERIFICATION_PENDING
 LOCAL_VALIDATION_VERIFICATION_PENDING
@@ -84,8 +85,11 @@ Behavior: generated documentation, readiness receipts, evidence, logs, and summa
 AI search writer repair: 571a679074ccb5fd7d40eee334f44c978f6935da
 Behavior: AI Search Agent is the sole governed evidence writer.
 Behavior: commit is created only when governed evidence changed.
-Behavior: writer rebases on current main before push.
 Commit surface: data/unverified/, data/logs/ai_agent/, data/summary/, data/evidence/.
+
+Pre-commit rebase hardening: db660b2b6bc0ee8b9094ad38c7266aca31cb5aa0
+Behavior: generated evidence is preserved with git pull --rebase --autostash before staging and committing.
+Behavior: the final evidence commit is created against current main, reducing non-fast-forward and rebase-conflict failures.
 
 Duplicate workflow retirement: 1e92c9016848a0fab80cd920cf5da37fe9ba2fdb
 Removed: .github/workflows/auto_update_tv_patch.yml
@@ -111,7 +115,7 @@ Retention: 30 days
 
 ```text
 Governed Local Validation passes on 0e4325d2c9c52140c43a67c7ee202acb0b6c96fa or later.
-AI Search Agent passes on 571a679074ccb5fd7d40eee334f44c978f6935da or later.
+AI Search Agent passes on db660b2b6bc0ee8b9094ad38c7266aca31cb5aa0 or later.
 Activation readiness receipt reports PASS.
 data/master/ remains byte-identical.
 No template-derived archive records reappear.
@@ -122,7 +126,7 @@ AI governed evidence output commit is recorded when changes exist.
 ## Next task
 
 ```text
-1. Inspect the runs triggered by 0e4325d2 and 571a6790 or later.
+1. Inspect the runs triggered by 0e4325d2 and db660b2b or later.
 2. Confirm both workflow conclusions are success.
 3. Record the passing run IDs and artifact names.
 4. Record the AI evidence output commit, or explicitly record that no governed evidence change required a commit.
