@@ -2,7 +2,7 @@ name: AI Search Agent (Public OSINT Sweep)
 
 on:
   schedule:
-    - cron: "30 10 * * *"   # daily 10:30 UTC
+    - cron: "30 10 * * *"
   workflow_dispatch: {}
   push:
     branches: [ "main" ]
@@ -12,6 +12,7 @@ on:
       - "scripts/search_run_evidence.py"
       - "scripts/test_search_run_evidence.py"
       - "scripts/test_search_agent_canonical_read_only.py"
+      - "scripts/verify_activation_readiness.py"
       - "scripts/validate_evidence_outputs.py"
       - "scripts/build_ai_agent_summary.py"
       - "data/sources/**"
@@ -50,6 +51,9 @@ jobs:
       - name: Prove canonical inputs are read-only
         run: python scripts/test_search_agent_canonical_read_only.py
 
+      - name: Verify activation boundaries
+        run: python scripts/verify_activation_readiness.py
+
       - name: Run AI Search Agent
         run: |
           python scripts/search_agent.py --base . --max-event-targets 25 --max-person-targets 25
@@ -60,6 +64,20 @@ jobs:
 
       - name: Validate portable evidence outputs
         run: python scripts/validate_evidence_outputs.py --base .
+
+      - name: Upload governed verification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: free-dom-ai-search-verification-${{ github.run_id }}
+          path: |
+            data/evidence/verification/activation-readiness.json
+            data/evidence/runs/
+            data/evidence/receipts/
+            data/evidence/batches/
+            data/logs/ai_agent/
+            data/summary/
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Commit governed evidence outputs if changed
         uses: EndBug/add-and-commit@v9
