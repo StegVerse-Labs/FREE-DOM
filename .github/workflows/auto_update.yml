@@ -72,6 +72,7 @@ jobs:
           fi
 
       - name: Upload governed validation evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: free-dom-local-validation-${{ github.run_id }}
