@@ -47,6 +47,9 @@ jobs:
       - name: Prove search agent keeps canonical inputs read-only
         run: python scripts/test_search_agent_canonical_read_only.py
 
+      - name: Verify activation boundaries
+        run: python scripts/verify_activation_readiness.py
+
       - name: Validate governed evidence outputs
         run: python scripts/validate_evidence_outputs.py --base .
 
@@ -67,6 +70,20 @@ jobs:
             git diff -- data/master/
             exit 1
           fi
+
+      - name: Upload governed validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: free-dom-local-validation-${{ github.run_id }}
+          path: |
+            data/evidence/verification/activation-readiness.json
+            data/evidence/runs/
+            data/evidence/receipts/
+            data/evidence/batches/
+            data/logs/ai_agent/
+            data/summary/
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Commit governed local artifacts if changed
         uses: EndBug/add-and-commit@v9
