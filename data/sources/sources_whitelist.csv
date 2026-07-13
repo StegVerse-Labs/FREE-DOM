@@ -1,7 +1,7 @@
-name,type,url,notes
-House Oversight Press,rss,https://oversight.house.gov/feed/,"Official releases; active manifest source SRC-HOUSE-OVERSIGHT-RSS"
-The New York Times US RSS,rss,https://rss.nytimes.com/services/xml/rss/nyt/US.xml,"Major outlet; active manifest source SRC-NYT-US"
-The Washington Post Politics RSS,rss,https://feeds.washingtonpost.com/rss/politics,"Major outlet; active manifest source SRC-WAPO-POLITICS"
-Oversight Homepage,site,https://oversight.house.gov/,"Homepage scan; active manifest source SRC-HOUSE-OVERSIGHT-SITE"
-The Guardian UK RSS,rss,https://www.theguardian.com/uk/rss,"UK coverage; active manifest source SRC-GUARDIAN-UK"
-ABC News US RSS,rss,https://abcnews.go.com/abcnews/topstories,"U.S. coverage; active manifest source SRC-ABC-TOP"
+source_id,name,type,url,notes
+SRC-HOUSE-OVERSIGHT-RSS,House Oversight Press,rss,https://oversight.house.gov/feed/,"Official releases; active governed source"
+SRC-NYT-US,The New York Times US RSS,rss,https://rss.nytimes.com/services/xml/rss/nyt/US.xml,"Major outlet; active governed source"
+SRC-WAPO-POLITICS,The Washington Post Politics RSS,rss,https://feeds.washingtonpost.com/rss/politics,"Major outlet; active governed source"
+SRC-HOUSE-OVERSIGHT-SITE,Oversight Homepage,site,https://oversight.house.gov/,"Homepage scan; active governed source"
+SRC-GUARDIAN-UK,The Guardian UK RSS,rss,https://www.theguardian.com/uk/rss,"UK coverage; active governed source"
+SRC-ABC-TOP,ABC News US RSS,rss,https://abcnews.go.com/abcnews/topstories,"U.S. coverage; active governed source"
