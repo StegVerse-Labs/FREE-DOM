@@ -44,6 +44,9 @@ jobs:
       - name: Validate zero-hit evidence path
         run: python scripts/test_search_run_evidence.py
 
+      - name: Validate governed source health
+        run: python scripts/test_source_health.py
+
       - name: Prove search agent keeps canonical inputs read-only
         run: python scripts/test_search_agent_canonical_read_only.py
 
@@ -78,6 +81,7 @@ jobs:
           name: free-dom-local-validation-${{ github.run_id }}
           path: |
             data/evidence/verification/activation-readiness.json
+            data/evidence/source-health/
             data/evidence/runs/
             data/evidence/receipts/
             data/evidence/batches/
