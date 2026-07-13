@@ -21,7 +21,7 @@ MANIFEST_FIELDS = [
     "authority_ref",
     "notes",
 ]
-WHITELIST_FIELDS = ["name", "type", "url", "notes"]
+WHITELIST_FIELDS = ["source_id", "name", "type", "url", "notes"]
 
 
 def write_csv(path: pathlib.Path, fields: list[str], rows: list[dict[str, str]]) -> None:
@@ -63,7 +63,8 @@ def base_rows() -> tuple[list[dict[str, str]], list[dict[str, str]]]:
     ]
     whitelist = [
         {
-            "name": "Active A",
+            "source_id": "SRC-A",
+            "name": "Legacy display label may differ",
             "type": "rss",
             "url": "https://example.test/a.xml",
             "notes": "active projection",
@@ -88,18 +89,33 @@ def main() -> int:
     duplicate.append(dict(manifest[0], source_id="SRC-C"))
     assert any("duplicate manifest URLs" in error for error in run_case(duplicate, whitelist))
 
+    duplicate_id_projection = [dict(whitelist[0]), dict(whitelist[0], url="https://example.test/other.xml")]
+    assert any("duplicate active whitelist source IDs" in error for error in run_case(manifest, duplicate_id_projection))
+
     undeclared = [dict(row) for row in whitelist]
-    undeclared.append({"name": "Unknown", "type": "rss", "url": "https://example.test/u.xml", "notes": ""})
+    undeclared.append(
+        {
+            "source_id": "SRC-UNKNOWN",
+            "name": "Unknown",
+            "type": "rss",
+            "url": "https://example.test/u.xml",
+            "notes": "",
+        }
+    )
     assert any("not active in manifest" in error for error in run_case(manifest, undeclared))
 
     missing = []
     assert any("missing from whitelist" in error for error in run_case(manifest, missing))
 
+    wrong_id = [dict(whitelist[0], source_id="SRC-WRONG")]
+    assert any("missing from whitelist" in error for error in run_case(manifest, wrong_id))
+    assert any("not active in manifest" in error for error in run_case(manifest, wrong_id))
+
     invalid = [dict(row) for row in manifest]
     invalid[1]["replacement_status"] = "none"
     assert any("non-active source" in error for error in run_case(invalid, whitelist))
 
-    print("PASS governed source manifest regression tests")
+    print("PASS governed source manifest stable-ID regression tests")
     return 0
 
 
