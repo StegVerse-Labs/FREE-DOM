@@ -25,6 +25,8 @@ Cross-repository mutation, release, deployment, tagging, and record promotion ar
 ```text
 MIRROR_HANDOFF_PRESENT
 AI_SEARCH_RUNTIME_BOUND_INSTALLED
+AI_SEARCH_CANONICAL_READ_ONLY_IMPLEMENTED
+AI_SEARCH_CANONICAL_READ_ONLY_TEST_INSTALLED
 AI_SEARCH_CANONICAL_IMMUTABILITY_GATE_INSTALLED
 TV_DEPENDENCY_REMOVED_FROM_LOCAL_VALIDATION
 PRIMARY_AUTO_UPDATE_MASTER_PROMOTION_REMOVED
@@ -55,10 +57,17 @@ Verification: pending
 
 ```text
 Finding: discovered links could modify canonical notes in the workflow workspace.
-Repair: remove data/master/ from the commit surface, restore canonical files, and assert a clean canonical diff.
-Repair commit: 38e15acaa90ac7b0adc0c8d21e5e7e1c66502d6b
+Initial repair: remove data/master/ from the commit surface, restore canonical files, and assert a clean canonical diff.
+Initial repair commit: 38e15acaa90ac7b0adc0c8d21e5e7e1c66502d6b
+Final code repair: search_agent.py now treats canonical datasets as read-only inputs and emits discoveries only through governed evidence outputs.
+Final code repair commit: a5ddeb54d5df75e2cbf4ea030000d001e41c427c
+Regression test: scripts/test_search_agent_canonical_read_only.py
+Test commit: fa7b5dd4890cff8e8013efd1db5a1b1cf79528c9
+AI Search workflow enforcement commit: d947705a5ebd35df14f4a51d3951f94db0420613
+Local validation enforcement commit: 89d30cdfa69cf7228217fe482a2f9ee131b32eb4
+Additional runtime bounds: 25 event targets, 25 person targets, 15-second source request timeout, deduplicated hit limit.
 Preserved commit surface: data/unverified/, data/logs/ai_agent/, data/summary/, data/evidence/
-Verification: pending
+Verification: pending current-main GitHub Actions result.
 ```
 
 ### TV workflow failure
@@ -104,7 +113,8 @@ Repository-local tests pass.
 AI Search Agent finishes within 30 minutes.
 Governed local validation finishes within 15 minutes.
 Pending-import governance test passes.
-data/master/ remains unchanged in automated workflows.
+Canonical read-only search-agent test passes.
+data/master/ remains byte-identical during automated search and validation.
 Template files remain scaffolding and are not processed as records.
 Governed evidence outputs retain source, uncertainty, and non-implication fields.
 Passing run IDs, output commit, and artifact paths are recorded here.
@@ -113,19 +123,17 @@ Passing run IDs, output commit, and artifact paths are recorded here.
 ## Next task
 
 ```text
-1. Verify Governed Local Validation on c00f7d5d135552d72d50b5f0af7c0522c895c662 or later.
-2. Verify AI Search Agent on 38e15acaa90ac7b0adc0c8d21e5e7e1c66502d6b or later.
+1. Verify Governed Local Validation on 89d30cdfa69cf7228217fe482a2f9ee131b32eb4 or later.
+2. Verify AI Search Agent on d947705a5ebd35df14f4a51d3951f94db0420613 or later.
 3. Inspect logs and annotations for any failure.
-4. Confirm data/master/ remains unchanged and no template-derived archive files reappear.
+4. Confirm data/master/ remains byte-identical and no template-derived archive files reappear.
 5. Record governed evidence manifest, receipt, Merkle batch, log, summary, output commit, and passing run IDs.
+6. Retire .github/workflows/auto_update_tv_patch.yml after the primary governed workflow is proven green.
 ```
 
 ## Known remaining files
 
 ```text
-scripts/search_agent.py
-  Refactor so canonical DataFrames are never mutated even transiently.
-
 .github/workflows/ai_search_agent.yml
   Verify bounded successful run and governed evidence commit.
 
@@ -133,10 +141,10 @@ scripts/search_agent.py
   Verify successful governed local validation run.
 
 .github/workflows/auto_update_tv_patch.yml
-  Consider retirement after the primary workflow is verified to avoid duplicate validation surfaces.
+  Retire after the primary workflow is verified to avoid duplicate validation surfaces.
 
 FREE_DOM_MIRROR_HANDOFF.md
-  Record final verification evidence.
+  Record final verification evidence and release-readiness conclusion.
 ```
 
 ## Archive readiness
