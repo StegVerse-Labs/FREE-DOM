@@ -2,9 +2,9 @@
 
 ## Source of truth
 
-This is the current repository-local handoff for `StegVerse-Labs/FREE-DOM`.
+This is the current repository-local continuation record for `StegVerse-Labs/FREE-DOM`.
 
-## Purpose and boundaries
+## Purpose and authority boundary
 
 ```text
 Role: public evidence-first research and structured chronology
@@ -16,8 +16,8 @@ Derived summaries: data/summary/
 
 Discovery is not verification.
 Automation may not promote or persist changes into data/master/.
-Templates are scaffolding and may not be ingested, promoted, or archived as real records.
-Cross-repository mutation, release, deployment, tagging, and record promotion are not authorized by this handoff.
+Templates are scaffolding and may not be ingested, promoted, or archived as records.
+Cross-repository mutation, release, deployment, tagging, and record promotion are not authorized here.
 ```
 
 ## Current state
@@ -28,82 +28,71 @@ AI_SEARCH_RUNTIME_BOUND_INSTALLED
 AI_SEARCH_CANONICAL_READ_ONLY_IMPLEMENTED
 AI_SEARCH_CANONICAL_READ_ONLY_TEST_INSTALLED
 AI_SEARCH_CANONICAL_IMMUTABILITY_GATE_INSTALLED
-TV_DEPENDENCY_REMOVED_FROM_LOCAL_VALIDATION
 PRIMARY_AUTO_UPDATE_MASTER_PROMOTION_REMOVED
-LOCAL_VALIDATION_RUNTIME_BOUND_INSTALLED
+TV_DEPENDENCY_REMOVED_FROM_LOCAL_VALIDATION
 PENDING_IMPORT_DEFAULT_DENY_INSTALLED
 PENDING_TEMPLATE_EXCLUSION_INSTALLED
 PENDING_IMPORT_GOVERNANCE_TEST_INSTALLED
+ACTIVATION_READINESS_RECEIPT_INSTALLED
+WORKFLOW_ARTIFACT_UPLOAD_INSTALLED
 AI_SEARCH_VERIFICATION_PENDING
 LOCAL_VALIDATION_VERIFICATION_PENDING
-CURRENT_MAIN_VERIFICATION_PENDING
+DUPLICATE_WORKFLOW_RETIREMENT_PENDING
 ```
 
-## Latest handled events
+## Repairs installed
 
-### AI Search Agent runtime failure
+### AI Search Agent
 
 ```text
-Run ID: 29176837511
-Commit: e875c82
-Job: sweep
-Result: failed after 4 hours, 5 minutes, 1 second
-Repair: add timeout-minutes: 30
-Repair commit: 1e25e3335bf9e12edba5b020a41169aa5867f69d
-Verification: pending
+Original failed run: 29176837511
+Original failure: sweep exceeded four hours
+Runtime-bound commit: 1e25e3335bf9e12edba5b020a41169aa5867f69d
+Initial canonical gate: 38e15acaa90ac7b0adc0c8d21e5e7e1c66502d6b
+Canonical read-only implementation: a5ddeb54d5df75e2cbf4ea030000d001e41c427c
+Canonical read-only regression test: fa7b5dd4890cff8e8013efd1db5a1b1cf79528c9
+AI workflow enforcement: d947705a5ebd35df14f4a51d3951f94db0420613
+Target bounds: 25 event targets and 25 person targets
+Source timeout: 15 seconds
+Result: canonical datasets are read-only by construction and workflow assertion.
 ```
 
-### AI Search Agent canonical-write risk
+### Primary local validation
 
 ```text
-Finding: discovered links could modify canonical notes in the workflow workspace.
-Initial repair: remove data/master/ from the commit surface, restore canonical files, and assert a clean canonical diff.
-Initial repair commit: 38e15acaa90ac7b0adc0c8d21e5e7e1c66502d6b
-Final code repair: search_agent.py now treats canonical datasets as read-only inputs and emits discoveries only through governed evidence outputs.
-Final code repair commit: a5ddeb54d5df75e2cbf4ea030000d001e41c427c
-Regression test: scripts/test_search_agent_canonical_read_only.py
-Test commit: fa7b5dd4890cff8e8013efd1db5a1b1cf79528c9
-AI Search workflow enforcement commit: d947705a5ebd35df14f4a51d3951f94db0420613
-Local validation enforcement commit: 89d30cdfa69cf7228217fe482a2f9ee131b32eb4
-Additional runtime bounds: 25 event targets, 25 person targets, 15-second source request timeout, deduplicated hit limit.
-Preserved commit surface: data/unverified/, data/logs/ai_agent/, data/summary/, data/evidence/
-Verification: pending current-main GitHub Actions result.
+Authority repair: 32cc4c0cf4ddb968eccfb7c7ff2de8c6c3d00fff
+Pending importer default-deny: d20bb2cf79338301930f145ae136677077184739
+Pending governance test: 5e884d9ea911ca160c8330429152563559093c6c
+Workflow test enforcement: c00f7d5d135552d72d50b5f0af7c0522c895c662
+Canonical read-only test enforcement: 89d30cdfa69cf7228217fe482a2f9ee131b32eb4
+Result: automated master promotion and archive processing are removed from the primary workflow.
 ```
 
-### TV workflow failure
+### Incorrect template artifact cleanup
 
 ```text
-Run ID: 29206257940
-Commit: 38e15acaa90ac7b0adc0c8d21e5e7e1c66502d6b
-First failing step: Fetch short-lived secrets from TV
-Failure: invalid repository-like value used as a network endpoint
-Repair commit: f70b502ebef36720c1ae148cb0189d1a02ac1700
-Result: TV access, id-token permission, pending merge, timeline mutation, and data/master commit handling removed from that workflow.
+Observed output commit: 15f8382befb6f034fa85302e3543bb8c153186b0
+Removed artifacts:
+- f07c57c1c07f3a0fb44d6c6c6f78176584f939e9
+- fea895ecf741baf9724619d7d9c40d4c87b23a2e
+- c6b28f3db331ee1ad0f3d3ca1adc567ff0693339
+Result: example templates no longer exist as processed archive records.
 ```
 
-### Primary auto-update authority gap
+## Durable verification infrastructure
 
 ```text
-Output commit: 15f8382befb6f034fa85302e3543bb8c153186b0
-Run ID recorded by output: 29206534584
-Finding: .github/workflows/auto_update.yml remained active and still called import_pending.py, update_timeline.py, and committed data/master/ and data/archive/.
-Observed effect: three example template files were archived as processed records.
-Repair commit: 32cc4c0cf4ddb968eccfb7c7ff2de8c6c3d00fff
-Cleanup commits: f07c57c1c07f3a0fb44d6c6c6f78176584f939e9, fea895ecf741baf9724619d7d9c40d4c87b23a2e, c6b28f3db331ee1ad0f3d3ca1adc567ff0693339
-Result: primary workflow converted to governed local validation; canonical and archive commit surfaces removed.
+Readiness verifier: scripts/verify_activation_readiness.py
+Verifier commit: 5487dc9883f804bf56fbc21c77cebcd2dea1c5a6
+AI workflow artifact commit: 371b4134f1e963d770bc3e989e22978f1862c5df
+Local validation artifact commit: 2f1468aafae0787ccc623e7cdd062b29e5c62ace
+Receipt path: data/evidence/verification/activation-readiness.json
+AI artifact name: free-dom-ai-search-verification-<run_id>
+Validation artifact name: free-dom-local-validation-<run_id>
+Retention: 30 days
 ```
 
-### Pending importer hardening
-
-```text
-Importer repair: d20bb2cf79338301930f145ae136677077184739
-Behavior: validation-only by default; canonical mutation requires --allow-master-promotion.
-Behavior: filenames containing template are excluded from ingestible pending batches.
-Test added: scripts/test_import_pending_governance.py
-Test commit: 5e884d9ea911ca160c8330429152563559093c6c
-Workflow enforcement commit: c00f7d5d135552d72d50b5f0af7c0522c895c662
-Verification: pending GitHub Actions result.
-```
+The readiness receipt records all static governance checks plus SHA-256 digests for canonical datasets and verified implementation files. Both workflows upload the receipt, evidence runs, receipts, Merkle batches, logs, and summaries.
 
 ## Completion conditions
 
@@ -111,40 +100,41 @@ Verification: pending GitHub Actions result.
 All workflow YAML parses.
 Repository-local tests pass.
 AI Search Agent finishes within 30 minutes.
-Governed local validation finishes within 15 minutes.
+Governed Local Validation finishes within 15 minutes.
 Pending-import governance test passes.
-Canonical read-only search-agent test passes.
-data/master/ remains byte-identical during automated search and validation.
-Template files remain scaffolding and are not processed as records.
+Canonical read-only regression test passes.
+Activation readiness receipt result is PASS.
+data/master/ remains byte-identical.
+No template-derived archive records reappear.
 Governed evidence outputs retain source, uncertainty, and non-implication fields.
-Passing run IDs, output commit, and artifact paths are recorded here.
+Passing run IDs, artifact names, output commit, and evidence paths are recorded here.
 ```
 
 ## Next task
 
 ```text
-1. Verify Governed Local Validation on 89d30cdfa69cf7228217fe482a2f9ee131b32eb4 or later.
-2. Verify AI Search Agent on d947705a5ebd35df14f4a51d3951f94db0420613 or later.
-3. Inspect logs and annotations for any failure.
-4. Confirm data/master/ remains byte-identical and no template-derived archive files reappear.
-5. Record governed evidence manifest, receipt, Merkle batch, log, summary, output commit, and passing run IDs.
-6. Retire .github/workflows/auto_update_tv_patch.yml after the primary governed workflow is proven green.
+1. Verify Governed Local Validation on 2f1468aafae0787ccc623e7cdd062b29e5c62ace or later.
+2. Verify AI Search Agent on 371b4134f1e963d770bc3e989e22978f1862c5df or later.
+3. Inspect the first failing step if either run fails.
+4. Confirm activation-readiness.json reports PASS and canonical digests remain stable.
+5. Record run IDs, artifact names, evidence paths, and output commit.
+6. Retire .github/workflows/auto_update_tv_patch.yml only after the primary governed workflow is proven green.
 ```
 
 ## Known remaining files
 
 ```text
 .github/workflows/ai_search_agent.yml
-  Verify bounded successful run and governed evidence commit.
+  Awaiting successful bounded run and uploaded evidence bundle.
 
 .github/workflows/auto_update.yml
-  Verify successful governed local validation run.
+  Awaiting successful governed local validation run and uploaded evidence bundle.
 
 .github/workflows/auto_update_tv_patch.yml
-  Retire after the primary workflow is verified to avoid duplicate validation surfaces.
+  Retire after primary validation is proven green.
 
 FREE_DOM_MIRROR_HANDOFF.md
-  Record final verification evidence and release-readiness conclusion.
+  Record final run evidence and activation conclusion.
 ```
 
 ## Archive readiness
