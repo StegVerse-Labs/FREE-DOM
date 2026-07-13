@@ -13,6 +13,8 @@ on:
       - "scripts/source_health.py"
       - "scripts/build_source_health_receipt.py"
       - "scripts/test_source_health.py"
+      - "scripts/validate_source_manifest.py"
+      - "scripts/test_source_manifest_governance.py"
       - "scripts/test_search_run_evidence.py"
       - "scripts/test_search_agent_canonical_read_only.py"
       - "scripts/verify_activation_readiness.py"
@@ -53,6 +55,11 @@ jobs:
 
       - name: Validate governed source health
         run: python scripts/test_source_health.py
+
+      - name: Validate governed source manifest
+        run: |
+          python scripts/test_source_manifest_governance.py
+          python scripts/validate_source_manifest.py --base .
 
       - name: Prove canonical inputs are read-only
         run: python scripts/test_search_agent_canonical_read_only.py
@@ -114,10 +121,12 @@ jobs:
               'source_health_result': source_health.get('result'),
               'healthy_source_coverage': source_health.get('healthy_coverage'),
               'source_health_receipt': source_health_paths[-1].relative_to(root).as_posix(),
+              'source_manifest_validation': 'PASS',
               'canonical_sha256': readiness.get('canonical_sha256', {}),
               'governance_checks': readiness.get('checks', []),
               'canonical_write_authority': False,
               'promotion_authority': False,
+              'source_manifest_mutation_authority': False,
           }
           out = root / 'data/evidence/runs' / f'ai-search-{run_id}.json'
           out.parent.mkdir(parents=True, exist_ok=True)
