@@ -65,6 +65,51 @@ jobs:
       - name: Validate portable evidence outputs
         run: python scripts/validate_evidence_outputs.py --base .
 
+      - name: Write durable successful run receipt
+        env:
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          TRIGGER_SHA: ${{ github.sha }}
+          TRIGGER_EVENT: ${{ github.event_name }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          ARTIFACT_NAME: free-dom-ai-search-verification-${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root = Path('.')
+          readiness_path = root / 'data/evidence/verification/activation-readiness.json'
+          readiness = json.loads(readiness_path.read_text(encoding='utf-8'))
+          if readiness.get('result') != 'PASS':
+              raise SystemExit('Refusing success receipt: activation readiness is not PASS')
+
+          run_id = os.environ['RUN_ID']
+          receipt = {
+              'schema': 'stegverse.free-dom.workflow-run-receipt.v1',
+              'workflow': 'AI Search Agent (Public OSINT Sweep)',
+              'result': 'PASS',
+              'run_id': int(run_id),
+              'run_attempt': int(os.environ['RUN_ATTEMPT']),
+              'trigger_sha': os.environ['TRIGGER_SHA'],
+              'trigger_event': os.environ['TRIGGER_EVENT'],
+              'workflow_ref': os.environ['WORKFLOW_REF'],
+              'artifact_name': os.environ['ARTIFACT_NAME'],
+              'generated_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+              'activation_readiness_result': readiness['result'],
+              'canonical_sha256': readiness.get('canonical_sha256', {}),
+              'governance_checks': readiness.get('checks', []),
+              'canonical_write_authority': False,
+              'promotion_authority': False,
+          }
+          out = root / 'data/evidence/runs' / f'ai-search-{run_id}.json'
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          print(f'Wrote durable PASS receipt: {out}')
+          PY
+
       - name: Upload governed verification evidence
         if: always()
         uses: actions/upload-artifact@v4
