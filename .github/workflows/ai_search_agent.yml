@@ -23,7 +23,7 @@ permissions:
 
 concurrency:
   group: freedom-ai-search-agent
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   sweep:
