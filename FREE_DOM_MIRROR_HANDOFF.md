@@ -39,6 +39,7 @@ WORKFLOW_ARTIFACT_UPLOAD_ALWAYS_INSTALLED
 LOCAL_VALIDATION_ARTIFACT_ONLY_INSTALLED
 AI_SEARCH_SINGLE_WRITER_INSTALLED
 AI_SEARCH_PRECOMMIT_REBASE_INSTALLED
+STALE_RUN_CANCELLATION_INSTALLED
 DUPLICATE_VALIDATION_WORKFLOW_RETIRED
 AI_SEARCH_VERIFICATION_PENDING
 LOCAL_VALIDATION_VERIFICATION_PENDING
@@ -73,23 +74,28 @@ Passed: artifact upload
 Failed only: final repository commit
 ```
 
-## Final write-surface repair
+## Final write and concurrency repair
 
 ```text
 Finding: multiple validation workflows attempted to write derived artifacts to main, creating competing branch writers after all governance checks had passed.
 
-Local validation repair: 0e4325d2c9c52140c43a67c7ee202acb0b6c96fa
-Behavior: Governed Local Validation is artifact-only and uses contents: read.
-Behavior: generated documentation, readiness receipts, evidence, logs, and summaries are uploaded but not committed.
+Local validation artifact-only repair: 0e4325d2c9c52140c43a67c7ee202acb0b6c96fa
+Behavior: Governed Local Validation uses contents: read and never writes to main.
+Behavior: generated documentation, readiness receipts, evidence, logs, and summaries are uploaded as artifacts only.
 
-AI search writer repair: 571a679074ccb5fd7d40eee334f44c978f6935da
+AI search single-writer repair: 571a679074ccb5fd7d40eee334f44c978f6935da
 Behavior: AI Search Agent is the sole governed evidence writer.
 Behavior: commit is created only when governed evidence changed.
 Commit surface: data/unverified/, data/logs/ai_agent/, data/summary/, data/evidence/.
 
 Pre-commit rebase hardening: db660b2b6bc0ee8b9094ad38c7266aca31cb5aa0
 Behavior: generated evidence is preserved with git pull --rebase --autostash before staging and committing.
-Behavior: the final evidence commit is created against current main, reducing non-fast-forward and rebase-conflict failures.
+Behavior: the final evidence commit is created against current main.
+
+AI stale-run cancellation: 9e1440ab308e037e0b22f687be8a662fc802385c
+Local validation stale-run cancellation: 6b274fea2aeb20b6ebb90f6a49a69eb781698eaa
+Behavior: cancel-in-progress is true for both workflows.
+Behavior: an older run cannot finish after and supersede a newer governance revision.
 
 Duplicate workflow retirement: 1e92c9016848a0fab80cd920cf5da37fe9ba2fdb
 Removed: .github/workflows/auto_update_tv_patch.yml
@@ -114,8 +120,8 @@ Retention: 30 days
 ## Completion conditions
 
 ```text
-Governed Local Validation passes on 0e4325d2c9c52140c43a67c7ee202acb0b6c96fa or later.
-AI Search Agent passes on db660b2b6bc0ee8b9094ad38c7266aca31cb5aa0 or later.
+Governed Local Validation passes on 6b274fea2aeb20b6ebb90f6a49a69eb781698eaa or later.
+AI Search Agent passes on 9e1440ab308e037e0b22f687be8a662fc802385c or later.
 Activation readiness receipt reports PASS.
 data/master/ remains byte-identical.
 No template-derived archive records reappear.
@@ -126,7 +132,7 @@ AI governed evidence output commit is recorded when changes exist.
 ## Next task
 
 ```text
-1. Inspect the runs triggered by 0e4325d2 and db660b2b or later.
+1. Inspect the runs triggered by 9e1440ab and 6b274fea or later.
 2. Confirm both workflow conclusions are success.
 3. Record the passing run IDs and artifact names.
 4. Record the AI evidence output commit, or explicitly record that no governed evidence change required a commit.
