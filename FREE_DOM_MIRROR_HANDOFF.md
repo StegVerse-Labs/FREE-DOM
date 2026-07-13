@@ -34,7 +34,9 @@ PENDING_IMPORT_DEFAULT_DENY_INSTALLED
 PENDING_TEMPLATE_EXCLUSION_INSTALLED
 PENDING_IMPORT_GOVERNANCE_TEST_INSTALLED
 ACTIVATION_READINESS_RECEIPT_INSTALLED
-WORKFLOW_ARTIFACT_UPLOAD_INSTALLED
+READINESS_SEMANTIC_CHECK_REPAIR_INSTALLED
+FAILURE_RECEIPT_PERSISTENCE_INSTALLED
+WORKFLOW_ARTIFACT_UPLOAD_ALWAYS_INSTALLED
 AI_SEARCH_VERIFICATION_PENDING
 LOCAL_VALIDATION_VERIFICATION_PENDING
 DUPLICATE_WORKFLOW_RETIREMENT_PENDING
@@ -79,20 +81,33 @@ Removed artifacts:
 Result: example templates no longer exist as processed archive records.
 ```
 
+## Latest verification failure and repair
+
+```text
+AI Search failed run: 29224234631
+AI Search commit: 371b4134f1e963d770bc3e989e22978f1862c5df
+Local Validation failed run: 29224242426
+Local Validation commit: 2f1468aafae0787ccc623e7cdd062b29e5c62ace
+Shared first failing step: Verify activation boundaries
+Passing steps before failure: pending-import governance, zero-hit evidence path, and canonical read-only regression tests
+Root cause: readiness verifier required the exact phrase validation-only while the importer correctly declares validated-by-default behavior and requires --allow-master-promotion.
+Verifier semantic repair: 1f0136f301f406a128e318aae01281157bd6ee24
+AI unconditional artifact-upload repair: e9e9ff42c0aa0c036902305111d06d94931ddf7e
+Local-validation unconditional artifact-upload repair: d80587e6e6f5720c47099b82fa143395e9071ba7
+Result: readiness checks are semantic; PASS and FAIL receipts are persisted; verification bundles upload even after a failed readiness check.
+```
+
 ## Durable verification infrastructure
 
 ```text
 Readiness verifier: scripts/verify_activation_readiness.py
-Verifier commit: 5487dc9883f804bf56fbc21c77cebcd2dea1c5a6
-AI workflow artifact commit: 371b4134f1e963d770bc3e989e22978f1862c5df
-Local validation artifact commit: 2f1468aafae0787ccc623e7cdd062b29e5c62ace
 Receipt path: data/evidence/verification/activation-readiness.json
 AI artifact name: free-dom-ai-search-verification-<run_id>
 Validation artifact name: free-dom-local-validation-<run_id>
 Retention: 30 days
 ```
 
-The readiness receipt records all static governance checks plus SHA-256 digests for canonical datasets and verified implementation files. Both workflows upload the receipt, evidence runs, receipts, Merkle batches, logs, and summaries.
+Both workflows upload the readiness receipt, evidence runs, transition receipts, Merkle batches, logs, and summaries. Failed readiness runs now preserve a machine-readable FAIL receipt.
 
 ## Completion conditions
 
@@ -113,11 +128,11 @@ Passing run IDs, artifact names, output commit, and evidence paths are recorded 
 ## Next task
 
 ```text
-1. Verify Governed Local Validation on 2f1468aafae0787ccc623e7cdd062b29e5c62ace or later.
-2. Verify AI Search Agent on 371b4134f1e963d770bc3e989e22978f1862c5df or later.
-3. Inspect the first failing step if either run fails.
+1. Verify Governed Local Validation on d80587e6e6f5720c47099b82fa143395e9071ba7 or later.
+2. Verify AI Search Agent on e9e9ff42c0aa0c036902305111d06d94931ddf7e or later.
+3. Inspect any new first failing step.
 4. Confirm activation-readiness.json reports PASS and canonical digests remain stable.
-5. Record run IDs, artifact names, evidence paths, and output commit.
+5. Record passing run IDs, artifact names, evidence paths, and output commit.
 6. Retire .github/workflows/auto_update_tv_patch.yml only after the primary governed workflow is proven green.
 ```
 
