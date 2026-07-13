@@ -11,15 +11,14 @@ on:
       - "scripts/evidence_chain.py"
       - "scripts/search_run_evidence.py"
       - "scripts/test_search_run_evidence.py"
+      - "scripts/test_search_agent_canonical_read_only.py"
       - "scripts/validate_evidence_outputs.py"
       - "scripts/build_ai_agent_summary.py"
       - "data/sources/**"
-      - "data/pending/**"
       - ".github/workflows/ai_search_agent.yml"
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: freedom-ai-search-agent
@@ -48,28 +47,21 @@ jobs:
       - name: Validate zero-hit evidence path
         run: python scripts/test_search_run_evidence.py
 
+      - name: Prove canonical inputs are read-only
+        run: python scripts/test_search_agent_canonical_read_only.py
+
       - name: Run AI Search Agent
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python scripts/search_agent.py --base .
+          python scripts/search_agent.py --base . --max-event-targets 25 --max-person-targets 25
           python scripts/build_ai_agent_summary.py --base .
 
-      - name: Enforce canonical master immutability
-        shell: bash
-        run: |
-          if ! git diff --quiet -- data/master/; then
-            echo "NOTICE: AI Search Agent attempted to modify canonical master records."
-            echo "NOTICE: Restoring data/master; unverified discoveries remain in governed evidence outputs only."
-            git diff -- data/master/
-            git restore --worktree --source=HEAD -- data/master/
-          fi
-          git diff --exit-code -- data/master/
+      - name: Assert canonical master immutability
+        run: git diff --exit-code -- data/master/
 
       - name: Validate portable evidence outputs
         run: python scripts/validate_evidence_outputs.py --base .
 
-      - name: Commit governed evidence outputs (if changed)
+      - name: Commit governed evidence outputs if changed
         uses: EndBug/add-and-commit@v9
         with:
           add: |
@@ -78,5 +70,6 @@ jobs:
             data/summary/
             data/evidence/
           message: "chore(ai-agent): update public-source leads + governed evidence receipts"
+          default_author: github_actions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
