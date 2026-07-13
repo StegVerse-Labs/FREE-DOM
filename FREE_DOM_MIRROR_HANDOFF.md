@@ -24,6 +24,7 @@ Cross-repository mutation, release, deployment, tagging, and record promotion ar
 
 ```text
 MIRROR_HANDOFF_PRESENT
+PORTABLE_OSINT_EVIDENCE_NODE_ACTIVE
 AI_SEARCH_RUNTIME_BOUND_INSTALLED
 AI_SEARCH_CANONICAL_READ_ONLY_IMPLEMENTED
 AI_SEARCH_CANONICAL_READ_ONLY_TEST_INSTALLED
@@ -42,67 +43,72 @@ AI_SEARCH_PRECOMMIT_REBASE_INSTALLED
 STALE_RUN_CANCELLATION_INSTALLED
 DUPLICATE_VALIDATION_WORKFLOW_RETIRED
 AI_SUCCESS_RUN_RECEIPT_INSTALLED
-AI_SEARCH_VERIFICATION_PENDING
-LOCAL_VALIDATION_VERIFICATION_PENDING
+AI_SEARCH_VERIFICATION_PASS
+LOCAL_VALIDATION_POST_REPAIR_FAILURES_NONE_OBSERVED
 ```
 
-## Verified passing behavior before final write failure
+## Activation evidence
 
 ```text
-AI Search run: 29224718903
-Commit: 1f0136f301f406a128e318aae01281157bd6ee24
-Duration: 5 minutes 40 seconds
-Passed: zero-hit evidence test
-Passed: canonical read-only test
-Passed: activation readiness verification
-Passed: bounded AI search execution
-Passed: canonical immutability assertion
-Passed: governed evidence validation
-Passed: artifact upload
-Failed only: final repository commit
-
-Local Validation run: 29224730374
-Commit: e9e9ff42c0aa0c036902305111d06d94931ddf7e
-Duration: 19 seconds
-Passed: pending-import governance
-Passed: zero-hit evidence test
-Passed: canonical read-only test
-Passed: activation readiness verification
-Passed: governed evidence validation
-Passed: derived documentation build
-Passed: canonical restore and immutability assertion
-Passed: artifact upload
-Failed only: final repository commit
+Successful AI workflow run: 29227794883
+Run attempt: 1
+Trigger event: push
+Trigger SHA: 742ef288eb8c8cb10097a588b06aad6fc57ec47b
+Workflow: AI Search Agent (Public OSINT Sweep)
+Workflow output commit: fe7c6cbdefd2514b2d90994f5816f9f3d153b7c3
+Run receipt: data/evidence/runs/ai-search-29227794883.json
+Run result: PASS
+Activation readiness result: PASS
+Canonical write authority: false
+Promotion authority: false
+Artifact: free-dom-ai-search-verification-29227794883
+Artifact ID: 8270475979
+Artifact digest: sha256:e8a3dac0455f5d054bbeb3129dab1a2a9ea6ce07fa9d2ff2be0b2ffe56098eb3
+Artifact size: 54453 bytes
+Artifact retention expiry: 2026-08-12T06:07:33Z
 ```
 
-## Final write, concurrency, and observability repair
+### Canonical SHA-256 values recorded by the successful run
 
 ```text
-Local validation artifact-only repair: 0e4325d2c9c52140c43a67c7ee202acb0b6c96fa
-Behavior: Governed Local Validation uses contents: read and never writes to main.
+data/master/master_batch_index.csv
+39709efe398311b735c8f6ffb740cf9ee9466940caccdd0593f5072b496fceee
 
-AI search single-writer repair: 571a679074ccb5fd7d40eee334f44c978f6935da
-Behavior: AI Search Agent is the sole governed evidence writer.
-Commit surface: data/unverified/, data/logs/ai_agent/, data/summary/, data/evidence/.
+data/master/master_timeline.csv
+33c46034ec3806f116ef27715d366abd7ab2bdd9128b7478308e51229df6e026
 
-Pre-commit rebase hardening: db660b2b6bc0ee8b9094ad38c7266aca31cb5aa0
-Behavior: generated evidence is preserved with git pull --rebase --autostash before staging and committing.
+data/master/organizations.csv
+a0ad86b60f249b51a512eb5dd475b925b4d9d301b8b4e9e0438503eadafefc30
 
-AI stale-run cancellation: 9e1440ab308e037e0b22f687be8a662fc802385c
-Local validation stale-run cancellation: 6b274fea2aeb20b6ebb90f6a49a69eb781698eaa
-Behavior: cancel-in-progress is true for both workflows.
+data/master/photo_video_anchors.csv
+df4ef39dfa00522e29d830a7b6a24c1eba8e605aa670e401d8f28061c762a7a3
 
-Durable successful-run receipt: 742ef288eb8c8cb10097a588b06aad6fc57ec47b
-Receipt path: data/evidence/runs/ai-search-<run_id>.json
-Receipt fields: run ID, attempt, trigger SHA, trigger event, workflow ref, artifact name, PASS result, readiness result, canonical SHA-256 map, governance checks, and denied canonical/promotion authority.
-Behavior: every successful AI run creates a governed repository-visible receipt and therefore a durable evidence commit.
-
-Duplicate workflow retirement: 1e92c9016848a0fab80cd920cf5da37fe9ba2fdb
-Removed: .github/workflows/auto_update_tv_patch.yml
-Result: one artifact-only validator and one bounded evidence writer remain.
+data/master/verified_people_events.csv
+a66ce41be9083b637fcfdbc3498aec6946d3b7ad8b06eb204227a5e270c1f027
 ```
 
-## Earlier governance repairs retained
+All 21 activation governance checks in the successful run receipt passed. The successful commit changed only governed evidence, logs, summaries, and the repository-visible run receipt; no canonical file was part of the commit.
+
+## Workflow topology
+
+```text
+Governed Local Validation
+- contents: read
+- artifact-only
+- canonical immutability checks
+- no repository write authority
+
+AI Search Agent
+- bounded to 25 event targets and 25 person targets
+- finite source timeout
+- sole governed evidence writer
+- canonical paths excluded from commit surface
+- pre-commit rebase with autostash
+- stale-run cancellation enabled
+- successful runs publish machine-readable receipts
+```
+
+## Key repair commits retained
 
 ```text
 AI runtime bound: 1e25e3335bf9e12edba5b020a41169aa5867f69d
@@ -110,34 +116,29 @@ Canonical read-only implementation: a5ddeb54d5df75e2cbf4ea030000d001e41c427c
 Canonical read-only regression test: fa7b5dd4890cff8e8013efd1db5a1b1cf79528c9
 Pending importer default-deny: d20bb2cf79338301930f145ae136677077184739
 Pending governance test: 5e884d9ea911ca160c8330429152563559093c6c
-Readiness verifier: scripts/verify_activation_readiness.py
-Readiness receipt: data/evidence/verification/activation-readiness.json
-AI artifact: free-dom-ai-search-verification-<run_id>
-Validation artifact: free-dom-local-validation-<run_id>
-Retention: 30 days
+Local validation artifact-only: 0e4325d2c9c52140c43a67c7ee202acb0b6c96fa
+AI search sole writer: 571a679074ccb5fd7d40eee334f44c978f6935da
+Pre-commit rebase hardening: db660b2b6bc0ee8b9094ad38c7266aca31cb5aa0
+AI stale-run cancellation: 9e1440ab308e037e0b22f687be8a662fc802385c
+Local validation stale-run cancellation: 6b274fea2aeb20b6ebb90f6a49a69eb781698eaa
+Successful-run receipt: 742ef288eb8c8cb10097a588b06aad6fc57ec47b
+Duplicate workflow retirement: 1e92c9016848a0fab80cd920cf5da37fe9ba2fdb
 ```
 
-## Completion conditions
+## Next goal
 
 ```text
-Governed Local Validation passes on 6b274fea2aeb20b6ebb90f6a49a69eb781698eaa or later.
-AI Search Agent passes on 742ef288eb8c8cb10097a588b06aad6fc57ec47b or later.
-A repository-visible data/evidence/runs/ai-search-<run_id>.json receipt exists with result PASS.
-Activation readiness receipt reports PASS.
-data/master/ remains byte-identical.
-No template-derived archive records reappear.
-AI artifact and validation artifact exist.
+SOURCE_HEALTH_AND_SIGNAL_QUALITY
 ```
 
-## Next task
+The activated run completed with zero hits while retaining explicit source failures. The next build phase should improve source health without weakening governance:
 
-```text
-1. Watch for the governed evidence commit generated by 742ef288 or later.
-2. Read data/evidence/runs/ai-search-<run_id>.json and record the run ID, trigger SHA, artifact name, readiness result, and canonical hashes.
-3. Confirm no newer Governed Local Validation failure notification exists after 6b274fea.
-4. Mark PORTABLE_OSINT_EVIDENCE_NODE_ACTIVE only after the PASS receipt is observed.
-```
+1. Deduplicate repeated source-failure entries within a run.
+2. Classify source failures as permanent, access-restricted, malformed, or transient.
+3. Replace obsolete RSS endpoints through governed source-manifest updates.
+4. Add source-health receipts and minimum healthy-source coverage thresholds.
+5. Preserve zero-hit runs as valid evidence outcomes rather than treating zero hits as failure.
 
 ## Archive readiness
 
-This file contains the exact continuation state; earlier conversation context is not required.
+Activation is complete and reconstructable from repository evidence. Earlier conversation context is not required.
