@@ -10,6 +10,9 @@ on:
       - "scripts/search_agent.py"
       - "scripts/evidence_chain.py"
       - "scripts/search_run_evidence.py"
+      - "scripts/source_health.py"
+      - "scripts/build_source_health_receipt.py"
+      - "scripts/test_source_health.py"
       - "scripts/test_search_run_evidence.py"
       - "scripts/test_search_agent_canonical_read_only.py"
       - "scripts/verify_activation_readiness.py"
@@ -48,6 +51,9 @@ jobs:
       - name: Validate zero-hit evidence path
         run: python scripts/test_search_run_evidence.py
 
+      - name: Validate governed source health
+        run: python scripts/test_source_health.py
+
       - name: Prove canonical inputs are read-only
         run: python scripts/test_search_agent_canonical_read_only.py
 
@@ -57,6 +63,7 @@ jobs:
       - name: Run AI Search Agent
         run: |
           python scripts/search_agent.py --base . --max-event-targets 25 --max-person-targets 25
+          python scripts/build_source_health_receipt.py --base . --minimum-healthy-coverage 0.50
           python scripts/build_ai_agent_summary.py --base .
 
       - name: Assert canonical master immutability
@@ -86,6 +93,11 @@ jobs:
           if readiness.get('result') != 'PASS':
               raise SystemExit('Refusing success receipt: activation readiness is not PASS')
 
+          source_health_paths = sorted((root / 'data/evidence/source-health').glob('source-health-*.json'))
+          if not source_health_paths:
+              raise SystemExit('Refusing success receipt: source-health receipt is missing')
+          source_health = json.loads(source_health_paths[-1].read_text(encoding='utf-8'))
+
           run_id = os.environ['RUN_ID']
           receipt = {
               'schema': 'stegverse.free-dom.workflow-run-receipt.v1',
@@ -99,6 +111,9 @@ jobs:
               'artifact_name': os.environ['ARTIFACT_NAME'],
               'generated_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
               'activation_readiness_result': readiness['result'],
+              'source_health_result': source_health.get('result'),
+              'healthy_source_coverage': source_health.get('healthy_coverage'),
+              'source_health_receipt': source_health_paths[-1].relative_to(root).as_posix(),
               'canonical_sha256': readiness.get('canonical_sha256', {}),
               'governance_checks': readiness.get('checks', []),
               'canonical_write_authority': False,
@@ -117,6 +132,7 @@ jobs:
           name: free-dom-ai-search-verification-${{ github.run_id }}
           path: |
             data/evidence/verification/activation-readiness.json
+            data/evidence/source-health/
             data/evidence/runs/
             data/evidence/receipts/
             data/evidence/batches/
