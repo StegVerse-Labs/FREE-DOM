@@ -1,3 +1,30 @@
+## v24.0.0 — 2026-07-12
+**Commit:** `d80587e` — fix(ci): always upload local validation receipts  
+**Author:** StegVerse  **Branch:** `main`  **Workflow:** `Governed Local Validation` (run 29224739354)
+
+<details><summary>Changed files</summary>
+
+```txt
+.github/workflows/auto_update.yml
+```
+</details>
+
+| Dataset | Count |
+|---|---:|
+| master_timeline.csv | 1166 |
+| verified_people_events.csv | 3 |
+| unverified_events.csv | 5 |
+| unverified_people.csv | 4 |
+| unverified_connections.csv | 4 |
+
+| Pending Batches | Count |
+|---|---:|
+| data/pending/events | 0 |
+| data/pending/people | 0 |
+| data/pending/unverified | 0 |
+
+---
+
 # 🧾 FREE-DOM — CHANGELOG
 
 All notable changes are recorded by the `Auto Update` workflow.
