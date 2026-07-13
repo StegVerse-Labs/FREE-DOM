@@ -93,7 +93,7 @@
     }
   ],
   "failures": [],
-  "generated_at": "2026-07-13T04:46:54.209493Z",
+  "generated_at": "2026-07-13T04:57:27.273873Z",
   "result": "PASS",
   "schema": "stegverse.free-dom.activation-readiness.v1",
   "verified_files_sha256": {
@@ -101,7 +101,7 @@
     "pending_test": "894e66c7765d710cb90e827c6a19e9c0909bdc79558567c94920631dc9b48b2e",
     "search_agent": "21171d2de900205a964cfdee0c1213493052906ed1233190d5880b2f11031055",
     "search_read_only_test": "afb9b9b15dcb6dd819b1e3fe6decd27a5c51ff0f874bcd54520dbe56ed9793d2",
-    "search_workflow": "9f56c172e524c13689dbdebc43595b333faca9ded4a548735c0916bd512212ef",
-    "validation_workflow": "d8aef572cd76ae5b5ea4f152b72f90cfa240d8f5679a0fe44fc66a9b7dbb84e1"
+    "search_workflow": "c052783f96d22089e4cc1dd0024b6997274e4a1539998198825984c571c4919a",
+    "validation_workflow": "24300c3d22239215ae353bc53bd1a10b2803d77e7e9de02b98a888ab10878d9c"
   }
 }
