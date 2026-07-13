@@ -45,6 +45,13 @@ DUPLICATE_VALIDATION_WORKFLOW_RETIRED
 AI_SUCCESS_RUN_RECEIPT_INSTALLED
 AI_SEARCH_VERIFICATION_PASS
 LOCAL_VALIDATION_POST_REPAIR_FAILURES_NONE_OBSERVED
+SOURCE_HEALTH_PHASE_ACTIVE
+SOURCE_URL_DEDUPLICATION_INSTALLED
+SOURCE_FAILURE_CLASSIFICATION_INSTALLED
+SOURCE_FAILURE_DEDUPLICATION_INSTALLED
+SOURCE_HEALTH_RECEIPT_INSTALLED
+SOURCE_HEALTH_TESTS_ENFORCED
+SOURCE_HEALTH_RUNTIME_VERIFICATION_PENDING
 ```
 
 ## Activation evidence
@@ -96,6 +103,7 @@ Governed Local Validation
 - contents: read
 - artifact-only
 - canonical immutability checks
+- source-health deterministic tests
 - no repository write authority
 
 AI Search Agent
@@ -106,9 +114,45 @@ AI Search Agent
 - pre-commit rebase with autostash
 - stale-run cancellation enabled
 - successful runs publish machine-readable receipts
+- source-health receipts are generated after each bounded sweep
 ```
 
-## Key repair commits retained
+## Source health and signal quality phase
+
+```text
+Source-health utility: scripts/source_health.py
+Deterministic tests: scripts/test_source_health.py
+Post-run builder: scripts/build_source_health_receipt.py
+Receipt path: data/evidence/source-health/source-health-<run_id>.json
+Schema: stegverse.free-dom.source-health.v1
+Minimum healthy-source coverage: 0.50
+Canonical write authority: false
+Promotion authority: false
+Source-manifest mutation authority: false
+```
+
+Installed behavior:
+
+1. Configured source URLs are deduplicated before health measurement.
+2. Repeated source failures collapse into one entry with `occurrence_count`.
+3. Failures are classified as permanent, access-restricted, malformed, transient, unexpected-response, or unknown.
+4. Healthy-source coverage is computed against unique configured sources.
+5. Zero-hit runs remain valid bounded outcomes.
+6. Source-health WARN does not grant authority to mutate canonical records or silently replace source manifests.
+7. The duplicate PBS whitelist row was removed.
+
+### Source-health commits
+
+```text
+Source-health classification and receipt utility: 53abef96501d1dd52e9d93ce44b7e343026b1cdf
+Deterministic source-health tests: f06f4b84b0c642cf3c6c2b0332f20e1792886652
+Post-run source-health builder: f03747b9a70dc8939ae866e61012668aa934f6b3
+Duplicate PBS source removal: 1d344c7355c415d5c3de42226fb5ad822c34c722
+AI workflow source-health enforcement: a207606396c8d992be8727e60d951c0e1d2ad367
+Local validation source-health enforcement: 662eedf5e101bb2154564778b297367c0134ea0a
+```
+
+## Key activation repair commits retained
 
 ```text
 AI runtime bound: 1e25e3335bf9e12edba5b020a41169aa5867f69d
@@ -125,20 +169,23 @@ Successful-run receipt: 742ef288eb8c8cb10097a588b06aad6fc57ec47b
 Duplicate workflow retirement: 1e92c9016848a0fab80cd920cf5da37fe9ba2fdb
 ```
 
-## Next goal
+## Current verification target
 
 ```text
-SOURCE_HEALTH_AND_SIGNAL_QUALITY
+1. Observe AI Search Agent on a207606396c8d992be8727e60d951c0e1d2ad367 or later.
+2. Confirm scripts/test_source_health.py passes.
+3. Confirm data/evidence/source-health/source-health-<run_id>.json is committed.
+4. Record healthy-source coverage and classification counts.
+5. Confirm canonical SHA-256 values remain unchanged.
+6. Use the health receipt to prepare governed source-manifest replacements for permanent or access-restricted endpoints.
 ```
 
-The activated run completed with zero hits while retaining explicit source failures. The next build phase should improve source health without weakening governance:
+## Next goal after runtime verification
 
-1. Deduplicate repeated source-failure entries within a run.
-2. Classify source failures as permanent, access-restricted, malformed, or transient.
-3. Replace obsolete RSS endpoints through governed source-manifest updates.
-4. Add source-health receipts and minimum healthy-source coverage thresholds.
-5. Preserve zero-hit runs as valid evidence outcomes rather than treating zero hits as failure.
+```text
+GOVERNED_SOURCE_MANIFEST_REPAIR
+```
 
 ## Archive readiness
 
-Activation is complete and reconstructable from repository evidence. Earlier conversation context is not required.
+Activation remains complete and reconstructable. This handoff now also contains the exact continuation state for source-health runtime verification.
