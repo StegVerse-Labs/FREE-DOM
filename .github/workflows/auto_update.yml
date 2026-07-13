@@ -44,6 +44,9 @@ jobs:
       - name: Validate zero-hit evidence path
         run: python scripts/test_search_run_evidence.py
 
+      - name: Prove search agent keeps canonical inputs read-only
+        run: python scripts/test_search_agent_canonical_read_only.py
+
       - name: Validate governed evidence outputs
         run: python scripts/validate_evidence_outputs.py --base .
 
