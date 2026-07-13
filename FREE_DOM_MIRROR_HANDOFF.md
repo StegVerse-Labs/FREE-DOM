@@ -41,6 +41,7 @@ GOVERNED_SOURCE_MANIFEST_INSTALLED
 SOURCE_MANIFEST_VALIDATOR_INSTALLED
 SOURCE_MANIFEST_REGRESSION_TESTS_INSTALLED
 ACTIVE_SOURCE_PROJECTION_INSTALLED
+STABLE_SOURCE_ID_PROJECTION_REPAIR_INSTALLED
 SOURCE_HEALTH_RUNTIME_VERIFICATION_PENDING
 ```
 
@@ -114,13 +115,14 @@ Regression tests: scripts/test_source_manifest_governance.py
 Lifecycle rules:
 
 1. Every source has a stable `source_id`.
-2. Allowed states are `active`, `quarantined_pending_revalidation`, and `retired`.
-3. The active whitelist must exactly match active manifest rows.
-4. Duplicate source IDs and duplicate manifest URLs fail validation.
-5. Non-active sources must declare replacement or revalidation posture.
-6. Every entry must retain `evidence_ref` and `authority_ref`.
-7. No guessed replacement endpoint is authorized.
-8. Quarantined sources remain visible in the manifest and are not silently deleted.
+2. `source_id`, source type, and URL define execution identity; display names may change without changing standing.
+3. Allowed states are `active`, `quarantined_pending_revalidation`, and `retired`.
+4. The active whitelist must exactly match active manifest rows by stable identity.
+5. Duplicate source IDs and duplicate manifest URLs fail validation.
+6. Non-active sources must declare replacement or revalidation posture.
+7. Every entry must retain `evidence_ref` and `authority_ref`.
+8. No guessed replacement endpoint is authorized.
+9. Quarantined sources remain visible in the manifest and are not silently deleted.
 
 The activation run evidence moved the following sources into `quarantined_pending_revalidation`:
 
@@ -135,18 +137,40 @@ C-SPAN site landing - unexpected response/202
 Reuters UK - access-restricted/401
 ```
 
-Active projection currently contains six sources that did not report retrieval failure in the activation run:
+The active projection currently contains six sources that did not report retrieval failure in the activation run:
 
 ```text
-House Oversight RSS
-New York Times US RSS
-Washington Post Politics RSS
-House Oversight homepage
-Guardian UK RSS
-ABC News Top Stories
+SRC-HOUSE-OVERSIGHT-RSS
+SRC-NYT-US
+SRC-WAPO-POLITICS
+SRC-HOUSE-OVERSIGHT-SITE
+SRC-GUARDIAN-UK
+SRC-ABC-TOP
 ```
 
 Quarantine is not a factual claim that a publisher is unavailable. It records only the bounded retrieval result and prevents repeated unhealthy requests pending governed revalidation or replacement.
+
+## Failed post-manifest verification and repair
+
+```text
+AI Search run: 29277069036
+Trigger commit: 54a2a7a868f1b18324bbacedd748ed00c56065d2
+Result: FAIL at Validate governed source manifest
+Passed before failure: zero-hit evidence test, source-health tests
+Failure artifact upload: PASS
+
+Governed Local Validation run: 29277088115
+Trigger commit: b5a8894fb49a0bd3c1cd69d315b8920501792cb0
+Result: FAIL at Validate governed source manifest
+Passed before failure: pending-import governance, zero-hit evidence test, source-health tests
+Failure artifact upload: PASS
+
+Root cause: the first validator compared mutable display names. The manifest and whitelist represented the same active URLs but used different legacy labels.
+
+Stable-ID whitelist repair: 2124cba44bc80ac3890df1820fa90975a3176fdc
+Stable-ID validator repair: cc390f2cbf5880ba9aa850449016be5dfe5bed57
+Stable-ID regression repair: 192b72094c5dd9475bf218c9811df8ad4f4c443b
+```
 
 ## Source-governance commits
 
@@ -168,10 +192,10 @@ Local manifest enforcement: b5a8894fb49a0bd3c1cd69d315b8920501792cb0
 ## Current verification target
 
 ```text
-1. Observe AI Search Agent on 54a2a7a868f1b18324bbacedd748ed00c56065d2 or later.
+1. Observe AI Search Agent on 192b72094c5dd9475bf218c9811df8ad4f4c443b or later.
 2. Confirm scripts/test_source_health.py passes.
 3. Confirm scripts/test_source_manifest_governance.py passes.
-4. Confirm scripts/validate_source_manifest.py reports PASS.
+4. Confirm scripts/validate_source_manifest.py reports PASS by stable source_id.
 5. Confirm a new data/evidence/source-health/source-health-<run_id>.json is committed.
 6. Record healthy-source coverage and classification counts.
 7. Confirm source_manifest_validation=PASS in the durable workflow receipt.
