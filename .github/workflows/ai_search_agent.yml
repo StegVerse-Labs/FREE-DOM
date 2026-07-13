@@ -86,11 +86,11 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase --autostash origin main
           git add data/unverified/ data/logs/ai_agent/ data/summary/ data/evidence/
           if git diff --cached --quiet; then
             echo "No governed evidence changes to commit."
             exit 0
           fi
           git commit -m "chore(ai-agent): update public-source leads + governed evidence receipts"
-          git pull --rebase origin main
           git push origin HEAD:main
