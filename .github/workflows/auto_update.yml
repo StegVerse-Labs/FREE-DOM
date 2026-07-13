@@ -12,7 +12,7 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: freedom-governed-local-validation
@@ -53,7 +53,7 @@ jobs:
       - name: Validate governed evidence outputs
         run: python scripts/validate_evidence_outputs.py --base .
 
-      - name: Build derived documentation
+      - name: Build derived documentation for verification
         run: |
           python scripts/build_checklist.py
           python scripts/build_changelog.py
@@ -66,7 +66,7 @@ jobs:
       - name: Assert canonical immutability
         run: |
           if ! git diff --quiet -- data/master/; then
-            echo "Canonical record mutation detected; refusing commit."
+            echo "Canonical record mutation detected; refusing validation."
             git diff -- data/master/
             exit 1
           fi
@@ -83,21 +83,8 @@ jobs:
             data/evidence/batches/
             data/logs/ai_agent/
             data/summary/
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Commit governed local artifacts if changed
-        uses: EndBug/add-and-commit@v9
-        with:
-          add: |
             CHANGELOG.md
             CHECKLIST.md
-            data/summary/
             docs/badges/
-            data/unverified/
-            data/evidence/
-            data/logs/ai_agent/
-          message: "chore(validation): rebuild governed local artifacts"
-          default_author: github_actions
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          if-no-files-found: error
+          retention-days: 30
