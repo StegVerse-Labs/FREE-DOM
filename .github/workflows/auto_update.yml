@@ -47,6 +47,11 @@ jobs:
       - name: Validate governed source health
         run: python scripts/test_source_health.py
 
+      - name: Validate governed source manifest
+        run: |
+          python scripts/test_source_manifest_governance.py
+          python scripts/validate_source_manifest.py --base .
+
       - name: Prove search agent keeps canonical inputs read-only
         run: python scripts/test_search_agent_canonical_read_only.py
 
