@@ -1,0 +1,41 @@
+{
+  "schema": "stegverse.free-dom.source-health.v1",
+  "run_id": "20260716T115945Z",
+  "generated_at": "2026-07-16T12:04:10.562860Z",
+  "result": "PASS",
+  "minimum_healthy_coverage": 0.5,
+  "healthy_coverage": 1.0,
+  "configured_source_count": 6,
+  "healthy_source_count": 6,
+  "failed_source_count": 0,
+  "configured_sources": [
+    "https://oversight.house.gov/feed/",
+    "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
+    "https://feeds.washingtonpost.com/rss/politics",
+    "https://www.theguardian.com/uk/rss",
+    "https://abcnews.go.com/abcnews/topstories",
+    "https://oversight.house.gov/"
+  ],
+  "healthy_sources": [
+    "https://oversight.house.gov/feed/",
+    "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
+    "https://feeds.washingtonpost.com/rss/politics",
+    "https://www.theguardian.com/uk/rss",
+    "https://abcnews.go.com/abcnews/topstories",
+    "https://oversight.house.gov/"
+  ],
+  "failed_sources": [],
+  "failure_classification_counts": {},
+  "failures": [],
+  "authority": {
+    "canonical_write": false,
+    "promotion": false,
+    "source_manifest_mutation": false
+  },
+  "limitations": [
+    "source health measures retrieval coverage, not factual truth",
+    "a healthy response does not establish completeness or correctness",
+    "a failed response does not establish source unavailability outside this run",
+    "zero search hits remain a valid bounded outcome"
+  ]
+}
