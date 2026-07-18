@@ -1,0 +1,23 @@
+{
+  "run_id": "20260718T112844Z",
+  "started_at": "2026-07-18T11:28:44.651415Z",
+  "completed_at": "2026-07-18T11:33:07.471428Z",
+  "scope": {
+    "pending_event_targets": 25,
+    "pending_person_targets": 3,
+    "rss_sources": 5,
+    "page_sources": 1
+  },
+  "results": {
+    "total_hits": 0,
+    "hit_receipts": 0,
+    "source_failures": []
+  },
+  "limitations": [
+    "zero hits do not prove absence",
+    "search coverage is limited to configured public sources and generated keywords",
+    "source retrieval failures reduce observable coverage",
+    "a run receipt grants no factual standing to any subject claim"
+  ],
+  "log_pointer": "data/logs/ai_agent/agent_run_20260718T112844Z.jsonl"
+}
