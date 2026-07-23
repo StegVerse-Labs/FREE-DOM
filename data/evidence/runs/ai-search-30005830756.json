@@ -1,4 +1,6 @@
 {
+  "activation_readiness_result": "PASS",
+  "artifact_name": "free-dom-ai-search-verification-30005830756",
   "canonical_sha256": {
     "data/master/master_batch_index.csv": "39709efe398311b735c8f6ffb740cf9ee9466940caccdd0593f5072b496fceee",
     "data/master/master_timeline.csv": "33c46034ec3806f116ef27715d366abd7ab2bdd9128b7478308e51229df6e026",
@@ -6,7 +8,9 @@
     "data/master/photo_video_anchors.csv": "df4ef39dfa00522e29d830a7b6a24c1eba8e605aa670e401d8f28061c762a7a3",
     "data/master/verified_people_events.csv": "a66ce41be9083b637fcfdbc3498aec6946d3b7ad8b06eb204227a5e270c1f027"
   },
-  "checks": [
+  "canonical_write_authority": false,
+  "generated_at": "2026-07-23T12:13:38.829846Z",
+  "governance_checks": [
     {
       "check": "required file exists: search_agent",
       "passed": true
@@ -92,16 +96,18 @@
       "passed": true
     }
   ],
-  "failures": [],
-  "generated_at": "2026-07-23T12:09:12.345596Z",
+  "healthy_source_coverage": 1.0,
+  "promotion_authority": false,
   "result": "PASS",
-  "schema": "stegverse.free-dom.activation-readiness.v1",
-  "verified_files_sha256": {
-    "pending_importer": "d4c1f4fbda45d58df8e6644a0d37d1702538d229614985c6fe3f2fa16ff13487",
-    "pending_test": "894e66c7765d710cb90e827c6a19e9c0909bdc79558567c94920631dc9b48b2e",
-    "search_agent": "21171d2de900205a964cfdee0c1213493052906ed1233190d5880b2f11031055",
-    "search_read_only_test": "afb9b9b15dcb6dd819b1e3fe6decd27a5c51ff0f874bcd54520dbe56ed9793d2",
-    "search_workflow": "ac310fc22fd2a5cfbd6553ef7a47c37b4d826fc914c831d65818b8040ed26ec4",
-    "validation_workflow": "64da134e44bf4ac0ab15bc420efedc343e8ff810e2ffea8a408ce0e266eeb2fc"
-  }
+  "run_attempt": 1,
+  "run_id": 30005830756,
+  "schema": "stegverse.free-dom.workflow-run-receipt.v1",
+  "source_health_receipt": "data/evidence/source-health/source-health-20260723T120912Z.json",
+  "source_health_result": "PASS",
+  "source_manifest_mutation_authority": false,
+  "source_manifest_validation": "PASS",
+  "trigger_event": "schedule",
+  "trigger_sha": "2db9c023055f751044b47c56983ab996dd08f654",
+  "workflow": "AI Search Agent (Public OSINT Sweep)",
+  "workflow_ref": "StegVerse-Labs/FREE-DOM/.github/workflows/ai_search_agent.yml@refs/heads/main"
 }
