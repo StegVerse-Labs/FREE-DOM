@@ -12,8 +12,9 @@
 - github_token_authority: NONE
 
 ## Claim
-- state: CLAIMED_FOR_VALIDATION
-- release_condition: deterministic populated trajectory fixture + ERL intake validation + registry promotion
+- state: COMPLETE / VALIDATION CLAIM RELEASED
+- released_at: 2026-08-11T18:10:00Z
+- release_evidence: `research/receipts/2026-08-11-populated-adapter-and-intake-validation.json`
 - collision_boundary: native FREE-DOM verified/master/unverified semantics and privacy rules remain unchanged
 
 ## Installed authoritative files
@@ -25,6 +26,7 @@
 - `research/research_receipts.jsonl`
 - `research/conformance.json`
 - `scripts/erl_research_agent.py`
+- `tests/test_erl_research_adapter_deterministic.py`
 - upstream standard: `StegVerse-Labs/Executive_Rhetoric_Ledger/standards/multi-trajectory-research-surface.v1.md`
 - upstream transport: `StegVerse-Labs/Executive_Rhetoric_Ledger/contracts/research-candidate-transport.v1.md`
 
@@ -32,31 +34,24 @@
 - recurrence: REQUIRED while active court/documentary/public-record trajectories remain unresolved;
 - default cadence: weekly, adjusted by trajectory volatility;
 - native FREE-DOM research is mixed research/ingest; ERL sidecar remains lead-only and cannot mutate native verified/master state;
-- contradictory/null/new trajectories are preserved.
+- potentially supporting, contrary, contextual, and null candidate evidence is preserved without local conclusion promotion.
 
-## Evidence
-- ERL research layer: `440b646f8b3692be6c4d6f65199443c6aaa83632`
-- conformance/recurrence profile: `93bb689c56f924182a6f241affae6303599e090f`
+## Validation evidence
 - adapter transport alignment: `4b48a1eb629cac726926e1e9237abad5d558cc59`
+- deterministic fixture: `c4d998f7de407029338361c032a110b5db482ba0`
+- populated adapter + ERL intake receipt: `63e36e8a1fc018abf0600f671fb09bc7b1d0fcc0`
+- conformance promotion: `073bad6b018066739d3c6a94026dc8a4f98a53ae`
 - native research evidence remains under `data/evidence/runs/` and separate from ERL trajectory candidate state.
 
-The ERL-specific adapter now emits `stegverse.erl.research_source_candidate.v1`, records `native_records_mutated=false`, `evaluation_changed=false`, `privacy_policy_preserved=true`, TV/TVC credential authority, GitHub token authority NONE, and authority effect NONE.
+Validated: ACTIVE searched, SATURATED excluded, supporting/contrary leads preserved, null result preserved, duplicate link collapsed, ERL intake PASS, native master/unverified sentinels unchanged, `privacy_policy_preserved=true`, native/evaluation mutation false, TV/TVC credential authority, GitHub token authority NONE, authority effect NONE.
 
-## Remaining
-1. run deterministic populated trajectory fixture against the ERL-specific adapter;
-2. validate privacy/provenance/deduplication and no-auto-promotion behavior;
-3. run emitted packet through ERL candidate intake validator;
-4. promote registry entry to CONFORMING.
-
-## Validation
-- native FREE-DOM tests remain authoritative for native research
-- `python scripts/erl_research_agent.py --base . --dry-run`
-- `python <ERL>/scripts/validate_research_surface.py .`
-- `python <ERL>/scripts/validate_research_candidate_intake.py research/source_candidates.jsonl`
+## Integration
+- central ERL registry promotion is the remaining cross-repository integration write
+- ERL sidecar cannot alter native FREE-DOM privacy/master semantics or independently evaluate ERL-governed propositions
 
 ## Completion accounting
-- ERL-specific developed-files: 7/7 = 100%
+- ERL-specific developed-files: 9/9 = 100%
 - scaffolding/stubs: 0
-- validation: 0/3
-- integration: 2/3
-- goal-activation: 75%
+- validation: 3/3
+- integration: 2/3 until central registry promotion
+- goal-activation: 95%
