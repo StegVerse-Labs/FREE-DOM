@@ -2,7 +2,6 @@
 
 ## Authority
 - goal_id: ERL-RESEARCH-SURFACE-FREEDOM-001
-- originating_goal: align existing FREE-DOM OSINT research with ERL multi-trajectory research authority
 - repository: StegVerse-Labs/FREE-DOM
 - branch: main
 - canonical_owner: StegVerse-Labs/Executive_Rhetoric_Ledger Issue #60
@@ -13,38 +12,41 @@
 - github_token_authority: NONE
 
 ## Claim
-- state: CLAIMED_FOR_INTEGRATION
-- claimant: current repository integration lane
-- created_at: 2026-08-11T15:34:00Z
-- release_condition: existing AI Search Agent outputs can emit trajectory-scoped ERL candidate packets without changing native verified/master semantics
-- collision_boundary: do not weaken FREE-DOM privacy/anonymity rules or allow ERL to promote native unverified leads automatically
+- state: CLAIMED_FOR_VALIDATION
+- release_condition: deterministic trajectory fixture validation plus ERL registry promotion
+- collision_boundary: native FREE-DOM verified/master/unverified semantics and privacy rules remain unchanged
 
-## Authoritative files
-- existing AI Search Agent and source whitelist
+## Installed authoritative files
+- existing native `scripts/search_agent.py` and source-health/evidence machinery
 - `research/README.md`
 - `research/frontier.json`
 - `research/acquisition_requests.jsonl`
 - `research/source_candidates.jsonl`
 - `research/research_receipts.jsonl`
+- `scripts/erl_research_agent.py`
 - upstream standard: `StegVerse-Labs/Executive_Rhetoric_Ledger/standards/multi-trajectory-research-surface.v1.md`
 
-## Incomplete work
-1. Install ERL research-frontier ledgers without replacing existing FREE-DOM datasets.
-2. Add adapter from existing AI Search Agent output to ERL candidate packets.
-3. Validate privacy, provenance, deduplication, and no-auto-promotion behavior.
-4. Promote registry state only after validation evidence exists.
+## Evidence
+- handoff: `a897914b1a85e922add0a48e29ed552214262937`
+- ERL research layer: `440b646f8b3692be6c4d6f65199443c6aaa83632`
+- native research evidence already exists under `data/evidence/runs/` and remains separate from ERL trajectory candidate state.
+
+The ERL-specific adapter writes only under `research/`, explicitly records `native_records_mutated=false`, preserves lead-only posture, and does not replace the existing FREE-DOM agent.
+
+## Remaining
+1. run deterministic populated trajectory fixture against the ERL-specific adapter;
+2. validate privacy/provenance/deduplication and no-auto-promotion behavior;
+3. ERL candidate intake/transport validation;
+4. promote registry entry to CONFORMING.
 
 ## Validation
-- existing FREE-DOM agent/test path remains authoritative for native research
-- parse ERL frontier JSON and append-only ledgers
-- candidate adapter must preserve `lead-only` / `context-only` posture
-
-## Dependencies
-- StegVerse-Labs/Executive_Rhetoric_Ledger Issue #60
-- TV/TVC credential governance
+- native FREE-DOM tests remain authoritative for native research
+- `python scripts/erl_research_agent.py --base . --dry-run`
+- `python <ERL>/scripts/validate_research_surface.py .`
 
 ## Completion accounting
-- developed-files: 1/6 ERL-specific integration files
+- ERL-specific developed-files: 6/6 = 100%
+- scaffolding/stubs: 0
 - validation: 0/3
-- integration: 0/2
-- goal-activation: 15%
+- integration: 1/2
+- goal-activation: 65%
