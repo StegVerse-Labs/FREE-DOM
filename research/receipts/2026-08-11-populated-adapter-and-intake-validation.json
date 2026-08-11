@@ -1,0 +1,10 @@
+{
+  "schema":"stegverse.erl.research_surface_validation_receipt.v1",
+  "repository":"StegVerse-Labs/FREE-DOM",
+  "adapter_commit":"4b48a1eb629cac726926e1e9237abad5d558cc59",
+  "test_fixture_commit":"c4d998f7de407029338361c032a110b5db482ba0",
+  "validation_type":"local_deterministic_contract_harness_plus_committed_reproducible_fixture",
+  "assertions":{"active_trajectory_requests":1,"saturated_trajectory_requests":0,"candidate_count":2,"receipt_count":2,"supporting_candidate_preserved":true,"contrary_candidate_preserved":true,"null_result_preserved":true,"duplicate_matching_link_collapsed":true,"candidate_intake_validator":"PASS","native_state_unchanged":true,"privacy_policy_preserved":true,"credential_authority":"TV/TVC","github_token_authority":"NONE","authority_effect":"NONE","native_records_mutated":false,"evaluation_changed":false},
+  "result":"PASS",
+  "promotion_effect":"eligible for ERL registry CONFORMING promotion; native FREE-DOM privacy/master semantics remain unchanged and ERL evaluation authority remains external"
+}
