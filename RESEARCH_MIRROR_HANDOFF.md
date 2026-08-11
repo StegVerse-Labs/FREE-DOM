@@ -23,12 +23,20 @@
 - `research/acquisition_requests.jsonl`
 - `research/source_candidates.jsonl`
 - `research/research_receipts.jsonl`
+- `research/conformance.json`
 - `scripts/erl_research_agent.py`
 - upstream standard: `StegVerse-Labs/Executive_Rhetoric_Ledger/standards/multi-trajectory-research-surface.v1.md`
+
+## Research posture
+- recurrence: REQUIRED while active court/documentary/public-record trajectories remain unresolved
+- default cadence: weekly, adjusted by trajectory volatility
+- native FREE-DOM research is a mixed research/ingest surface; ERL sidecar remains lead-only and cannot mutate native verified/master state
+- all plausible trajectories are eligible for search; contradictory/null/new trajectories are preserved
 
 ## Evidence
 - handoff: `a897914b1a85e922add0a48e29ed552214262937`
 - ERL research layer: `440b646f8b3692be6c4d6f65199443c6aaa83632`
+- conformance/recurrence profile: `93bb689c56f924182a6f241affae6303599e090f`
 - native research evidence already exists under `data/evidence/runs/` and remains separate from ERL trajectory candidate state.
 
 The ERL-specific adapter writes only under `research/`, explicitly records `native_records_mutated=false`, preserves lead-only posture, and does not replace the existing FREE-DOM agent.
@@ -45,8 +53,8 @@ The ERL-specific adapter writes only under `research/`, explicitly records `nati
 - `python <ERL>/scripts/validate_research_surface.py .`
 
 ## Completion accounting
-- ERL-specific developed-files: 6/6 = 100%
+- ERL-specific developed-files: 7/7 = 100%
 - scaffolding/stubs: 0
 - validation: 0/3
 - integration: 1/2
-- goal-activation: 65%
+- goal-activation: 68%
