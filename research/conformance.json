@@ -1,28 +1,20 @@
 {
-  "schema": "stegverse.erl.research_conformance.v1",
-  "repository": "StegVerse-Labs/FREE-DOM",
-  "role": "domain-acquisition-surface-with-native-research",
-  "canonical_owner": "StegVerse-Labs/Executive_Rhetoric_Ledger#60",
-  "evaluation_authority": "StegVerse-Labs/Executive_Rhetoric_Ledger for ERL-governed propositions",
-  "acquisition_authority": "native FREE-DOM research plus ERL sidecar candidate discovery",
-  "adapter": "scripts/erl_research_agent.py",
-  "frontier": "research/frontier.json",
-  "recurrence": {
-    "classification": "REQUIRED",
-    "owner": "StegVerse-Labs/FREE-DOM",
-    "cadence_default": "weekly",
-    "basis": "active documentary/court/source research and existing recurring native search evidence",
-    "stop_condition": "all relevant ERL trajectories SATURATED/SUPERSEDED or recurrence explicitly DELEGATED"
-  },
-  "scheduled_ingest": {
-    "classification": "mixed",
-    "paths": ["native AI Search Agent and repository search/evidence runs"],
-    "note": "Native research remains authoritative for native FREE-DOM semantics; ERL sidecar emits only trajectory-scoped lead/context candidates."
-  },
-  "candidate_posture": "lead-only/context-only until ERL review",
-  "native_records_mutation_by_erl_sidecar": false,
-  "github_token_authority": "NONE",
-  "credential_authority": "TV/TVC where applicable",
-  "validation_state": "PENDING_VALIDATION",
-  "next_action": "run deterministic trajectory fixture, verify native-record immutability/privacy, validate ERL intake/transport, then promote registry to CONFORMING"
+  "schema":"stegverse.erl.research_conformance.v1",
+  "repository":"StegVerse-Labs/FREE-DOM",
+  "role":"domain-acquisition-surface-with-native-research",
+  "canonical_owner":"StegVerse-Labs/Executive_Rhetoric_Ledger#60",
+  "evaluation_authority":"StegVerse-Labs/Executive_Rhetoric_Ledger for ERL-governed propositions",
+  "acquisition_authority":"native FREE-DOM research plus ERL sidecar candidate discovery",
+  "adapter":"scripts/erl_research_agent.py",
+  "frontier":"research/frontier.json",
+  "recurrence":{"classification":"REQUIRED","owner":"StegVerse-Labs/FREE-DOM","cadence_default":"weekly","basis":"active documentary/court/source research and existing recurring native search evidence","stop_condition":"all relevant ERL trajectories SATURATED/SUPERSEDED or recurrence explicitly DELEGATED"},
+  "scheduled_ingest":{"classification":"mixed","paths":["native AI Search Agent and repository search/evidence runs"],"note":"Native research remains authoritative for native FREE-DOM semantics; ERL sidecar emits only trajectory-scoped lead/context candidates."},
+  "candidate_posture":"lead-only/context-only until ERL review",
+  "native_records_mutation_by_erl_sidecar":false,
+  "github_token_authority":"NONE",
+  "credential_authority":"TV/TVC where applicable",
+  "validation_state":"CONFORMING",
+  "validation_evidence":["tests/test_erl_research_adapter_deterministic.py","research/receipts/2026-08-11-populated-adapter-and-intake-validation.json"],
+  "validated_adapter_commit":"4b48a1eb629cac726926e1e9237abad5d558cc59",
+  "next_action":"continue REQUIRED native/ERL-sidecar acquisition while preserving privacy and native master semantics; ERL alone evaluates ERL-governed propositions"
 }
