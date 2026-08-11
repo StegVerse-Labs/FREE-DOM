@@ -13,7 +13,7 @@
 
 ## Claim
 - state: CLAIMED_FOR_VALIDATION
-- release_condition: deterministic trajectory fixture validation plus ERL registry promotion
+- release_condition: deterministic populated trajectory fixture + ERL intake validation + registry promotion
 - collision_boundary: native FREE-DOM verified/master/unverified semantics and privacy rules remain unchanged
 
 ## Installed authoritative files
@@ -26,35 +26,37 @@
 - `research/conformance.json`
 - `scripts/erl_research_agent.py`
 - upstream standard: `StegVerse-Labs/Executive_Rhetoric_Ledger/standards/multi-trajectory-research-surface.v1.md`
+- upstream transport: `StegVerse-Labs/Executive_Rhetoric_Ledger/contracts/research-candidate-transport.v1.md`
 
 ## Research posture
-- recurrence: REQUIRED while active court/documentary/public-record trajectories remain unresolved
-- default cadence: weekly, adjusted by trajectory volatility
-- native FREE-DOM research is a mixed research/ingest surface; ERL sidecar remains lead-only and cannot mutate native verified/master state
-- all plausible trajectories are eligible for search; contradictory/null/new trajectories are preserved
+- recurrence: REQUIRED while active court/documentary/public-record trajectories remain unresolved;
+- default cadence: weekly, adjusted by trajectory volatility;
+- native FREE-DOM research is mixed research/ingest; ERL sidecar remains lead-only and cannot mutate native verified/master state;
+- contradictory/null/new trajectories are preserved.
 
 ## Evidence
-- handoff: `a897914b1a85e922add0a48e29ed552214262937`
 - ERL research layer: `440b646f8b3692be6c4d6f65199443c6aaa83632`
 - conformance/recurrence profile: `93bb689c56f924182a6f241affae6303599e090f`
-- native research evidence already exists under `data/evidence/runs/` and remains separate from ERL trajectory candidate state.
+- adapter transport alignment: `4b48a1eb629cac726926e1e9237abad5d558cc59`
+- native research evidence remains under `data/evidence/runs/` and separate from ERL trajectory candidate state.
 
-The ERL-specific adapter writes only under `research/`, explicitly records `native_records_mutated=false`, preserves lead-only posture, and does not replace the existing FREE-DOM agent.
+The ERL-specific adapter now emits `stegverse.erl.research_source_candidate.v1`, records `native_records_mutated=false`, `evaluation_changed=false`, `privacy_policy_preserved=true`, TV/TVC credential authority, GitHub token authority NONE, and authority effect NONE.
 
 ## Remaining
 1. run deterministic populated trajectory fixture against the ERL-specific adapter;
 2. validate privacy/provenance/deduplication and no-auto-promotion behavior;
-3. ERL candidate intake/transport validation;
+3. run emitted packet through ERL candidate intake validator;
 4. promote registry entry to CONFORMING.
 
 ## Validation
 - native FREE-DOM tests remain authoritative for native research
 - `python scripts/erl_research_agent.py --base . --dry-run`
 - `python <ERL>/scripts/validate_research_surface.py .`
+- `python <ERL>/scripts/validate_research_candidate_intake.py research/source_candidates.jsonl`
 
 ## Completion accounting
 - ERL-specific developed-files: 7/7 = 100%
 - scaffolding/stubs: 0
 - validation: 0/3
-- integration: 1/2
-- goal-activation: 68%
+- integration: 2/3
+- goal-activation: 75%
