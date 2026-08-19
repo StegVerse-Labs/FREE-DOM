@@ -1,0 +1,46 @@
+{
+  "receipt_version": "stegverse.evidence-transition-receipt.v1",
+  "receipt_id": "RCPT-RUN-1469ec631a0e8c5a30d8dfb6",
+  "evidence_id": "EVID-FREEDOM-RUN-1469ec631a0e8c5a30d8dfb6",
+  "manifest_hash": "sha256:f498f188c206c8383ff020a656f5402b0bae20753ff727c437f570272ad37616",
+  "producer_node_id": "StegVerse-Labs/FREE-DOM",
+  "actor": "github-actions:FREE-DOM-ai-search-agent",
+  "authority_class": "observe",
+  "transition_type": "captured",
+  "occurred_at": "2026-08-19T10:58:22.397795Z",
+  "effective_at": "2026-08-19T10:58:22.397795Z",
+  "policy_ref": "StegVerse-Labs/repo-standards:ST-007@v1",
+  "input_state": "search-run-started",
+  "output_state": "search-run-recorded",
+  "result": "RECORDED",
+  "reason_codes": [
+    "search-run-executed",
+    "results-bounded-by-configured-scope",
+    "zero-hits-not-absence-proof"
+  ],
+  "evidence_effect": "discovery-only",
+  "standing": {
+    "status": "unreviewed",
+    "as_of": "2026-08-19T10:58:22.397795Z",
+    "basis_receipt_ids": [],
+    "counterevidence_receipt_ids": [],
+    "unresolved_questions": [
+      "Whether additional sources or alternate queries would produce different results."
+    ],
+    "excluded_inferences": [
+      "absence of an event, person, relationship, or record",
+      "completeness of public-source coverage",
+      "truth or falsity of any subject claim",
+      "culpability or exoneration"
+    ]
+  },
+  "acknowledgment": {
+    "destination_node_id": "StegVerse-Labs/Executive_Rhetoric_Ledger",
+    "status": "pending",
+    "acknowledgment_id": null
+  },
+  "previous_receipt_hash": null,
+  "supersedes_receipt_id": null,
+  "receipt_hash": "sha256:88667b0b3f4c81043512d04c6e3e80854d75f20a20f2673a07066809ae2b1cdc",
+  "signature": null
+}
