@@ -1,20 +1,19 @@
-# .github/workflows/forward-to-bridge.yml
-name: Forward PR to StegVerse AI Bridge
+name: Forward PR to StegVerse AI Bridge [CONTAINED — NO CROSS-REPO AUTHORITY]
 
 on:
-  pull_request:
-    types: [opened, reopened, synchronize]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
 
 jobs:
-  forward:
+  contained:
     runs-on: ubuntu-latest
     steps:
-      - name: Call repository_dispatch on bridge
-        env:
-          GH_TOKEN: ${{ secrets.GH_STEGVERSE_AI_TOKEN }}
+      - name: Block legacy bridge dispatch
+        shell: bash
         run: |
-          echo "${GH_TOKEN}" | gh auth login --with-token
-          gh api repos/StegVerse/hybrid-collab-bridge/dispatches \
-            -X POST \
-            -F event_type="stegverse-ai-review" \
-            -F client_payload="{\"target_repo\":\"${GITHUB_REPOSITORY}\",\"pr_number\":${{ github.event.pull_request.number }}}"
+          set -euo pipefail
+          echo "::error::This bridge-dispatch path is contained because FREE-DOM's canonical handoff grants no cross-repository mutation/dispatch authority and the prior workflow used a generic non-TV/TVC credential."
+          echo "Any future external review transport must be separately admitted, TV/TVC-governed, and evidence-only with no canonical record promotion authority."
+          exit 1
