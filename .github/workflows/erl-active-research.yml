@@ -1,0 +1,66 @@
+name: ERL Active Research Acquisition
+
+on:
+  schedule:
+    - cron: '15 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: erl-active-research
+  cancel-in-progress: false
+
+jobs:
+  acquire-sort-persist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate research adapter
+        run: python tests/test_erl_research_adapter_deterministic.py
+      - name: Acquire new trajectory-scoped source candidates
+        run: python scripts/erl_research_agent.py
+      - name: Sort, deduplicate, and summarize current research data
+        run: |
+          python - <<'PY'
+          import json,pathlib,datetime
+          root=pathlib.Path('research')
+          def load(p):
+              if not p.exists(): return []
+              return [json.loads(x) for x in p.read_text(encoding='utf-8').splitlines() if x.strip()]
+          def write(p,rows): p.write_text(''.join(json.dumps(r,sort_keys=True)+'\n' for r in rows),encoding='utf-8')
+          c=load(root/'source_candidates.jsonl'); r=load(root/'research_receipts.jsonl')
+          c=list({x.get('candidate_id') or json.dumps(x,sort_keys=True):x for x in c}.values())
+          r=list({x.get('receipt_id') or json.dumps(x,sort_keys=True):x for x in r}.values())
+          c.sort(key=lambda x:(tuple(x.get('trajectory_ids',[])),x.get('source_class',''),x.get('source_url','')))
+          r.sort(key=lambda x:(x.get('request_id',''),x.get('source_scanned',''),x.get('retrieved_at','')))
+          write(root/'source_candidates.jsonl',c); write(root/'research_receipts.jsonl',r)
+          rc={}; tc={}
+          for x in r: rc[x.get('result','UNKNOWN')]=rc.get(x.get('result','UNKNOWN'),0)+1
+          for x in c:
+              for t in x.get('trajectory_ids',[]): tc[t]=tc.get(t,0)+1
+          s={'schema':'stegverse.erl.active_research_state.v1','repository':'StegVerse-Labs/FREE-DOM','updated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'state':'ACTIVE_ACQUIRING','candidate_count':len(c),'receipt_count':len(r),'receipt_results':rc,'trajectory_candidate_counts':tc,'sorting_actions':['deduplicate_candidate_id','deduplicate_receipt_id','sort_by_trajectory_source_url','summarize_result_states'],'evaluation_authority_effect':'NONE'}
+          (root/'active-research-state.json').write_text(json.dumps(s,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          print(json.dumps(s,sort_keys=True))
+          PY
+      - name: Persist acquisition and sorting receipts
+        run: |
+          git config user.name 'stegverse-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add research/source_candidates.jsonl research/research_receipts.jsonl research/active-research-state.json
+          if git diff --cached --quiet; then echo 'No semantic research-data change to persist.'; else git commit -m 'research: persist active ERL acquisition cycle'; git push; fi
+      - name: Upload cycle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: erl-active-research-${{ github.run_id }}
+          path: |
+            research/source_candidates.jsonl
+            research/research_receipts.jsonl
+            research/active-research-state.json
+          retention-days: 90
