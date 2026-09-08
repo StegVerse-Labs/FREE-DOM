@@ -1,0 +1,17 @@
+{
+  "candidate_count": 0,
+  "evaluation_authority_effect": "NONE",
+  "receipt_count": 0,
+  "receipt_results": {},
+  "repository": "StegVerse-Labs/FREE-DOM",
+  "schema": "stegverse.erl.active_research_state.v1",
+  "sorting_actions": [
+    "deduplicate_candidate_id",
+    "deduplicate_receipt_id",
+    "sort_by_trajectory_source_url",
+    "summarize_result_states"
+  ],
+  "state": "ACTIVE_ACQUIRING",
+  "trajectory_candidate_counts": {},
+  "updated_at": "2026-09-08T04:43:12.178260+00:00"
+}
