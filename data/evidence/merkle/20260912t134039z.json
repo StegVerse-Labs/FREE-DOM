@@ -1,0 +1,16 @@
+{
+  "batch_version": "stegverse.evidence-merkle-batch.v1",
+  "batch_id": "BATCH-FREEDOM-20260912t134039z",
+  "producer_node_id": "StegVerse-Labs/FREE-DOM",
+  "created_at": "2026-09-12T13:45:05.141158Z",
+  "hash_algorithm": "sha256",
+  "leaf_order": "lexicographic-receipt-id",
+  "leaf_receipt_hashes": [
+    "sha256:42b441d1cb6d51974d2bcadae4bcf264ed49fdf460501ed48706261fbbf996e4"
+  ],
+  "merkle_root": "sha256:42b441d1cb6d51974d2bcadae4bcf264ed49fdf460501ed48706261fbbf996e4",
+  "previous_batch_hash": "sha256:39c22022a22df8b67e385f9b5f67145b1a283938ae40a27138d7d4f9180bb32a",
+  "checkpoint_ref": "data/evidence/merkle/20260911t143157z.json",
+  "batch_hash": "sha256:3faa765991be14abb4ffd64ed4adf5908396252b96a8c2ce623e798933b76b54",
+  "signature": null
+}
