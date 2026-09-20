@@ -1,0 +1,11 @@
+{
+  "proof_version": "stegverse.merkle-inclusion-proof.v1",
+  "batch_id": "BATCH-FREEDOM-20260920t141757z",
+  "batch_hash": "sha256:c7c3ee8f74383da167797a926a02e7f1d93f95666113ab5c52c190401f7fb1a9",
+  "merkle_root": "sha256:9263e4c64ca2ab96e005a9e3ecef5cd41f162f0fc52e90e83a054a73e42909f2",
+  "receipt_id": "RCPT-RUN-67329d94d804c3a0de681755",
+  "receipt_hash": "sha256:9263e4c64ca2ab96e005a9e3ecef5cd41f162f0fc52e90e83a054a73e42909f2",
+  "leaf_index": 0,
+  "siblings": [],
+  "proof_hash": "sha256:7fa2bce9d2db793f61e4d88837655e2ec469b79b36e5a5f2ca1ae3775956e466"
+}
