@@ -1,0 +1,52 @@
+{
+  "schema": "stegverse.free-dom.source-health.v1",
+  "run_id": "20261022T103902Z",
+  "generated_at": "2026-10-22T10:43:24.120336Z",
+  "result": "PASS",
+  "minimum_healthy_coverage": 0.5,
+  "healthy_coverage": 0.833333,
+  "configured_source_count": 6,
+  "healthy_source_count": 5,
+  "failed_source_count": 1,
+  "configured_sources": [
+    "https://oversight.house.gov/feed/",
+    "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
+    "https://feeds.washingtonpost.com/rss/politics",
+    "https://www.theguardian.com/uk/rss",
+    "https://abcnews.go.com/abcnews/topstories",
+    "https://oversight.house.gov/"
+  ],
+  "healthy_sources": [
+    "https://oversight.house.gov/feed/",
+    "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
+    "https://www.theguardian.com/uk/rss",
+    "https://abcnews.go.com/abcnews/topstories",
+    "https://oversight.house.gov/"
+  ],
+  "failed_sources": [
+    "https://feeds.washingtonpost.com/rss/politics"
+  ],
+  "failure_classification_counts": {
+    "transient": 1
+  },
+  "failures": [
+    {
+      "source": "https://feeds.washingtonpost.com/rss/politics",
+      "stage": "rss-fetch",
+      "classification": "transient",
+      "error": "status=502",
+      "occurrence_count": 28
+    }
+  ],
+  "authority": {
+    "canonical_write": false,
+    "promotion": false,
+    "source_manifest_mutation": false
+  },
+  "limitations": [
+    "source health measures retrieval coverage, not factual truth",
+    "a healthy response does not establish completeness or correctness",
+    "a failed response does not establish source unavailability outside this run",
+    "zero search hits remain a valid bounded outcome"
+  ]
+}
