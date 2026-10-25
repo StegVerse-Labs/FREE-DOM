@@ -1,0 +1,1 @@
+python scripts/verify_activation_readiness.py

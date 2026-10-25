@@ -1,0 +1,1 @@
+python scripts/test_import_pending_governance.py

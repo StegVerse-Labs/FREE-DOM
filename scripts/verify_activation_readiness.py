@@ -29,7 +29,7 @@ def main() -> int:
     files = {
         "search_agent": ROOT / "scripts" / "search_agent.py",
         "search_workflow": ROOT / ".github" / "workflows" / "ai_search_agent.yml",
-        "validation_workflow": ROOT / ".github" / "workflows" / "auto_update.yml",
+        "validation_workflow": ROOT / "tools" / "tasks" / "folded" / "auto_update.yml",
         "pending_importer": ROOT / "scripts" / "import_pending.py",
         "pending_test": ROOT / "scripts" / "test_import_pending_governance.py",
         "search_read_only_test": ROOT / "scripts" / "test_search_agent_canonical_read_only.py",
