@@ -1,0 +1,1 @@
+python scripts/validate_evidence_outputs.py --base .

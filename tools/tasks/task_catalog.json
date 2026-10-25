@@ -1,0 +1,174 @@
+{
+ "schema": "stegverse.task-catalog/v1",
+ "repository": "StegVerse-Labs/FREE-DOM",
+ "goal_id": "G17-WORKFLOW-SURFACE-MINIMIZATION",
+ "authority": "Rigel 2026-10-24 retroactive G17 enforcement (StegVerse-org/.github#166); pattern StegVerse-Labs/StegDB#60 (eab2e773)",
+ "dispatcher": ".github/workflows/validation-dispatcher.yml",
+ "runner": "tools/tasks/run_catalog.py",
+ "runner_source": "StegVerse-Labs/StegDB tools/tasks/run_catalog.py @ eab2e773271f3e63466a710f1b4555f677882848 (sha256 f741f30557888fd8e4852a52adfc65736a08898d49ade7519f6bcc2672921e9b), copied unmodified",
+ "rule": "Every check a folded workflow job ran is one group here; its step bodies are the original run blocks byte for byte, pinned by sha256, except the repairs listed. A new check is a new group (or a step in one), never a new workflow file.",
+ "path_filters": "Dropped: every group runs on every pull_request and push to main (a superset of the original path-filtered runs). workflow_dispatch/schedule triggers are not carried (no manual dispatch, no cron).",
+ "repairs": [
+  "test-readiness.repo-smoke used to run on every push, pull request and dispatch; it now runs on pull requests and pushes to main.",
+  "auto_update.build (Governed Local Validation) used to run on path-filtered push to main and dispatch; it now runs on every pull request and push to main (a superset).",
+  "scripts/verify_activation_readiness.py: validation_workflow now reads the verbatim record tools/tasks/folded/auto_update.yml (bytes unchanged by git mv), so the activation-readiness check still inspects the same Governed Local Validation definition; the AI Search Agent writer runs the same verifier."
+ ],
+ "folded_from_commit": "70bf9c93e66767ee2bfc0cb2e7350a030d8df7e3",
+ "groups": [
+  {
+   "id": "test-readiness.repo-smoke",
+   "source": {
+    "workflow": ".github/workflows/test-readiness.yml",
+    "workflow_name": "Test Readiness",
+    "job": "repo-smoke",
+    "job_name": null,
+    "commit": "70bf9c9",
+    "triggers_before": [
+     "push",
+     "pull_request",
+     "workflow_dispatch"
+    ],
+    "permissions_before": {
+     "contents": "read"
+    }
+   },
+   "events": [
+    "pull_request",
+    "push"
+   ],
+   "env": {},
+   "steps": [
+    {
+     "name": "Baseline repository smoke test",
+     "run_file": "tools/tasks/steps/test-readiness.repo-smoke/01-baseline-repository-smoke-test.sh",
+     "run_sha256": "b9ca9ed2406c9532b40bd3c46ae13c4eb0924562a3232a0b9308a04329377ec1"
+    }
+   ],
+   "artifacts": [],
+   "runner": {
+    "fetch_depth": "1",
+    "persist_credentials": "true",
+    "timeout_minutes": 5,
+    "python_version": "3.11"
+   }
+  },
+  {
+   "id": "auto_update.build",
+   "source": {
+    "workflow": ".github/workflows/auto_update.yml",
+    "workflow_name": "Governed Local Validation",
+    "job": "build",
+    "job_name": null,
+    "commit": "70bf9c9",
+    "triggers_before": [
+     "push",
+     "workflow_dispatch"
+    ],
+    "permissions_before": {
+     "contents": "read"
+    }
+   },
+   "events": [
+    "pull_request",
+    "push"
+   ],
+   "env": {},
+   "steps": [
+    {
+     "name": "Install deps",
+     "run_file": "tools/tasks/steps/auto_update.build/01-install-deps.sh",
+     "run_sha256": "dc189f4c81872e70e99f851937f8748dad684f2288b706b984f40ea8b60699cf"
+    },
+    {
+     "name": "Validate pending-import governance",
+     "run_file": "tools/tasks/steps/auto_update.build/02-validate-pending-import-governance.sh",
+     "run_sha256": "f7dcb52c6683d667276123e733ca8968bf1bc1ab7b8debe19eef8b7e96dd541b"
+    },
+    {
+     "name": "Validate zero-hit evidence path",
+     "run_file": "tools/tasks/steps/auto_update.build/03-validate-zero-hit-evidence-path.sh",
+     "run_sha256": "b39810f89503ff73173cb6911eca16b74414ae00a20557bde87400b6a980f17b"
+    },
+    {
+     "name": "Validate governed source health",
+     "run_file": "tools/tasks/steps/auto_update.build/04-validate-governed-source-health.sh",
+     "run_sha256": "7be1d65c62ad9cec8d080a422c3a3efb3b0e25bc36bfda0c8eae7aae33e5030b"
+    },
+    {
+     "name": "Validate governed source manifest",
+     "run_file": "tools/tasks/steps/auto_update.build/05-validate-governed-source-manifest.sh",
+     "run_sha256": "edc4cdf507e38b91802bd1556712a57a99c449726fee52a992a857d494609a83"
+    },
+    {
+     "name": "Prove search agent keeps canonical inputs read-only",
+     "run_file": "tools/tasks/steps/auto_update.build/06-prove-search-agent-keeps-canonical-inputs-read-only.sh",
+     "run_sha256": "1746763cdbec810f0f7252e96220dec1eb7c6a13b30d1ab67a6f4743afcb797f"
+    },
+    {
+     "name": "Verify activation boundaries",
+     "run_file": "tools/tasks/steps/auto_update.build/07-verify-activation-boundaries.sh",
+     "run_sha256": "a50371e9f0c360ba33a021545b2338c06898fb839f28e1e2c61619b7fd233b08"
+    },
+    {
+     "name": "Validate governed evidence outputs",
+     "run_file": "tools/tasks/steps/auto_update.build/08-validate-governed-evidence-outputs.sh",
+     "run_sha256": "214fe3f7568720526943603be2d106b9b6168a36c31ddae4b2ef19e342d40757"
+    },
+    {
+     "name": "Build derived documentation for verification",
+     "run_file": "tools/tasks/steps/auto_update.build/09-build-derived-documentation-for-verification.sh",
+     "run_sha256": "e8ab1a826202f4224ee2928e41156f1d2a07df747a8b9e4fd95209cd0acde94e"
+    },
+    {
+     "name": "Restore canonical records",
+     "run_file": "tools/tasks/steps/auto_update.build/10-restore-canonical-records.sh",
+     "run_sha256": "cef9d59a6dbca115420354ed674ae60a0fac8f686c3dfab9aaf350afdbf349c9"
+    },
+    {
+     "name": "Assert canonical immutability",
+     "run_file": "tools/tasks/steps/auto_update.build/11-assert-canonical-immutability.sh",
+     "run_sha256": "ea75cabc46f08fc898504c8a0a76a07aa77065d3e3b20fb8630dfe389189783c"
+    }
+   ],
+   "artifacts": [
+    {
+     "name": "free-dom-local-validation-${{ github.run_id }}",
+     "path": "data/evidence/verification/activation-readiness.json\ndata/evidence/source-health/\ndata/evidence/runs/\ndata/evidence/receipts/\ndata/evidence/batches/\ndata/logs/ai_agent/\ndata/summary/\nCHANGELOG.md\nCHECKLIST.md\ndocs/badges/\n",
+     "if_no_files_found": "error",
+     "if": "always()"
+    }
+   ],
+   "runner": {
+    "fetch_depth": "0",
+    "persist_credentials": "true",
+    "timeout_minutes": 15,
+    "python_version": "3.11",
+    "artifact_name": "free-dom-local-validation",
+    "artifact_if_no_files_found": "error"
+   }
+  },
+  {
+   "id": "workflow-surface-registry.validate",
+   "catalog_addition": "G17 registry gate (no folded source workflow)",
+   "events": [
+    "pull_request",
+    "push"
+   ],
+   "env": {},
+   "steps": [
+    {
+     "name": "Workflow files equal the registered surfaces; catalog verifies ALLOW",
+     "run_file": "tools/tasks/steps/workflow-surface-registry.validate/01-registry.sh",
+     "run_sha256": "811824e88664923006be2eeb35632d710f5504145967f61632ad9e8fbdcb35ca"
+    }
+   ],
+   "artifacts": [],
+   "runner": {
+    "fetch_depth": "1",
+    "persist_credentials": "false",
+    "timeout_minutes": 10,
+    "python_version": "3.11"
+   }
+  }
+ ]
+}

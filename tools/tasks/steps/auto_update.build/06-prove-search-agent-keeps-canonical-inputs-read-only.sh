@@ -1,0 +1,1 @@
+python scripts/test_search_agent_canonical_read_only.py

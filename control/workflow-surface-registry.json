@@ -1,0 +1,131 @@
+{
+ "schema": "stegverse.workflow-surface-registry/v1",
+ "goal_id": "G17-WORKFLOW-SURFACE-MINIMIZATION",
+ "repository": "StegVerse-Labs/FREE-DOM",
+ "policy_issue": "StegVerse-Labs/.github#167, #168; StegVerse-org/.github#166",
+ "preferred_repository_workflow_count_max": 2,
+ "exception_repository_workflow_count_max": 3,
+ "credential_authority": "the SKAP Vault inside KV is the only PII and credential store for every user, including the StegVerse ecosystem's own; no secret or token is referenced, introduced or moved by this fold",
+ "invariants": [
+  "Every workflow file is registered in surfaces[]; an unregistered or changed one fails closed (tests/test_workflow_surface_registry.py).",
+  "A new check is a group in tools/tasks/task_catalog.json, never a new workflow file.",
+  "The stable dispatcher carries no workflow_dispatch, schedule, repository_dispatch, issues or workflow_run trigger; a kept surface is pinned by sha256 and unchanged by the fold.",
+  "G17 documented exception: above 2 workflow files, every kept surface other than the dispatcher carries an exception record (lifecycle and technical-necessity justification); the count never exceeds exception_repository_workflow_count_max (3)."
+ ],
+ "unregistered_workflow_outcome": {
+  "disposition": "FAIL_CLOSED",
+  "failure_code": "UNREGISTERED_WORKFLOW_SURFACE",
+  "failed_predicate": "EVERY_WORKFLOW_FILE_IS_REGISTERED",
+  "required_evidence_or_repair": "register the file in control/workflow-surface-registry.json surfaces[] or fold it into tools/tasks/task_catalog.json",
+  "retry_entrypoint": "tests/test_workflow_surface_registry.py",
+  "owning_existing_goal": "G17-WORKFLOW-SURFACE-MINIMIZATION (StegVerse-Labs/.github#167/#168); StegVerse-org/.github#166",
+  "next_attempt": "the next pull request touching .github/workflows/"
+ },
+ "surfaces": [
+  {
+   "path": ".github/workflows/validation-dispatcher.yml",
+   "classification": "KEEP_STABLE_DISPATCHER",
+   "triggers": [
+    "pull_request",
+    "push"
+   ],
+   "permissions": {
+    "contents": "read"
+   }
+  },
+  {
+   "path": ".github/workflows/ai_search_agent.yml",
+   "classification": "KEEP_EXISTING_SURFACE_UNCHANGED",
+   "triggers": [
+    "schedule",
+    "workflow_dispatch",
+    "push"
+   ],
+   "permissions": {
+    "contents": "write"
+   },
+   "reason": "KEEP_EXISTING_SURFACE_UNCHANGED (documented exception, destination-owned evidence writer): AI Search Agent (Public OSINT Sweep) runs governed checks, then commits data/unverified/, data/logs/ai_agent/, data/summary/ and data/evidence/ with contents: write on its existing daily schedule and path-filtered push to main (green through 2026-10-24). Technical necessity: the stable dispatcher holds contents: read only and cannot carry a git push; its concurrency group freedom-ai-search-agent and schedule are distinct from the ERL writer's, so the two writers cannot share one file without changing either's trigger or concurrency. Its schedule is existing, not added, and is not changed.",
+   "verbatim_sha256": "ac310fc22fd2a5cfbd6553ef7a47c37b4d826fc914c831d65818b8040ed26ec4",
+   "exception": {
+    "lifecycle": "destination-owned evidence writer (daily OSINT sweep)",
+    "justification": "KEEP_EXISTING_SURFACE_UNCHANGED (documented exception, destination-owned evidence writer): AI Search Agent (Public OSINT Sweep) runs governed checks, then commits data/unverified/, data/logs/ai_agent/, data/summary/ and data/evidence/ with contents: write on its existing daily schedule and path-filtered push to main (green through 2026-10-24). Technical necessity: the stable dispatcher holds contents: read only and cannot carry a git push; its concurrency group freedom-ai-search-agent and schedule are distinct from the ERL writer's, so the two writers cannot share one file without changing either's trigger or concurrency. Its schedule is existing, not added, and is not changed.",
+    "within_exception_ceiling": true
+   }
+  },
+  {
+   "path": ".github/workflows/erl-active-research.yml",
+   "classification": "KEEP_EXISTING_SURFACE_UNCHANGED",
+   "triggers": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "permissions": {
+    "contents": "write"
+   },
+   "reason": "KEEP_EXISTING_SURFACE_UNCHANGED (documented exception, destination-owned writer): ERL Active Research Acquisition acquires, sorts and commits research/ state with contents: write on its existing 6-hourly schedule (green through 2026-10-25). Technical necessity: the read-only dispatcher cannot carry that write, and it is a different writer, schedule and destination path than the AI Search Agent. Its schedule is existing, not added, and is not changed.",
+   "verbatim_sha256": "bcb340615c00ae1042833c9f066156fb13eea2b81d83c457cecb9fb0aaefdf6b",
+   "exception": {
+    "lifecycle": "destination-owned research writer (6-hourly ERL acquisition)",
+    "justification": "KEEP_EXISTING_SURFACE_UNCHANGED (documented exception, destination-owned writer): ERL Active Research Acquisition acquires, sorts and commits research/ state with contents: write on its existing 6-hourly schedule (green through 2026-10-25). Technical necessity: the read-only dispatcher cannot carry that write, and it is a different writer, schedule and destination path than the AI Search Agent. Its schedule is existing, not added, and is not changed.",
+    "within_exception_ceiling": true
+   }
+  }
+ ],
+ "folded": [
+  {
+   "workflow": ".github/workflows/forward-to-bridge.yml",
+   "name": "Forward PR to StegVerse AI Bridge [CONTAINED \u2014 NO CROSS-REPO AUTHORITY]",
+   "triggers_before": [
+    "workflow_dispatch"
+   ],
+   "classification": "ELIMINATE",
+   "status": "DONE",
+   "reason": "Already contained in-repo: its only trigger is workflow_dispatch and its only step prints that the bridge-dispatch path is contained (FREE-DOM's canonical handoff grants no cross-repository dispatch authority) and exits 1. It has no recorded run. Consistent with StegVerse-Labs/StegVerse-SCW docs/SCW_AI_BRIDGE_DISPATCH_CREDENTIAL_BOUNDARY_MIRROR_HANDOFF.md @8a5c3136 (dispatch retired; replacement TVC_ADMITTED_TRANSPORT_REQUIRED). Kept verbatim as a record.",
+   "verbatim_record": "tools/tasks/folded/forward-to-bridge.yml",
+   "verbatim_sha256": "5412009d1cb349bfb9c21c4fe014c49048c063bcbe4335caf1f1a2aaeb3fe24d"
+  },
+  {
+   "workflow": ".github/workflows/bootstrap_tv_policy_repo.yml",
+   "name": "Bootstrap TV Policy Repo",
+   "triggers_before": [
+    "workflow_dispatch"
+   ],
+   "classification": "ELIMINATE",
+   "status": "DONE",
+   "reason": "Its only trigger is workflow_dispatch: it materializes the secret TV_BOOTSTRAP_TOKEN to create a private repository in another organization. It has no recorded run. Consumer secret materialization is prohibited (StegVerse-SCW docs/SCW_AI_BRIDGE_DISPATCH_CREDENTIAL_BOUNDARY_MIRROR_HANDOFF.md @8a5c3136); credentials live only in the SKAP Vault inside KV. The lane runs no dispatch and carries no secret. Kept verbatim as a record.",
+   "verbatim_record": "tools/tasks/folded/bootstrap_tv_policy_repo.yml",
+   "verbatim_sha256": "a39507c32f03a3dbe618baa064bf4516f057fb4deae0ede3e2408ab06b5b13ba"
+  },
+  {
+   "workflow": ".github/workflows/test-readiness.yml",
+   "name": "Test Readiness",
+   "triggers_before": [
+    "push",
+    "pull_request",
+    "workflow_dispatch"
+   ],
+   "classification": "CONSOLIDATE_INTO_STABLE_DISPATCHER",
+   "status": "DONE",
+   "catalog_groups": [
+    "test-readiness.repo-smoke"
+   ],
+   "verbatim_record": "tools/tasks/folded/test-readiness.yml",
+   "verbatim_sha256": "8508ba02eab5538440c83e9d43a26fd5a9a4c66185cdc0d4b73f8fcb49225f17"
+  },
+  {
+   "workflow": ".github/workflows/auto_update.yml",
+   "name": "Governed Local Validation",
+   "triggers_before": [
+    "push",
+    "workflow_dispatch"
+   ],
+   "classification": "CONSOLIDATE_INTO_STABLE_DISPATCHER",
+   "status": "DONE",
+   "catalog_groups": [
+    "auto_update.build"
+   ],
+   "verbatim_record": "tools/tasks/folded/auto_update.yml",
+   "verbatim_sha256": "64da134e44bf4ac0ab15bc420efedc343e8ff810e2ffea8a408ce0e266eeb2fc"
+  }
+ ]
+}
