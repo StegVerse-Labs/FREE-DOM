@@ -5,9 +5,9 @@
  "authority": "Rigel 2026-10-24 retroactive G17 enforcement (StegVerse-org/.github#166); pattern StegVerse-Labs/StegDB#60 (eab2e773)",
  "dispatcher": ".github/workflows/validation-dispatcher.yml",
  "runner": "tools/tasks/run_catalog.py",
- "runner_source": "StegVerse-Labs/StegDB tools/tasks/run_catalog.py @ eab2e773271f3e63466a710f1b4555f677882848 (sha256 f741f30557888fd8e4852a52adfc65736a08898d49ade7519f6bcc2672921e9b), copied unmodified",
+ "runner_source": "StegVerse-Labs/StegDB tools/tasks/run_catalog.py @ eab2e773271f3e63466a710f1b4555f677882848 (sha256 f741f30557888fd8e4852a52adfc65736a08898d49ade7519f6bcc2672921e9b), copied unmodified; then patched with the original-path-filter selection (matrix marks cells selected; StegVerse-Labs/Site#1647 pattern), so it no longer equals that sha256",
  "rule": "Every check a folded workflow job ran is one group here; its step bodies are the original run blocks byte for byte, pinned by sha256, except the repairs listed. A new check is a new group (or a step in one), never a new workflow file.",
- "path_filters": "Dropped: every group runs on every pull_request and push to main (a superset of the original path-filtered runs). workflow_dispatch/schedule triggers are not carried (no manual dispatch, no cron).",
+ "path_filters": "Restored: each folded group carries its original workflow's push / pull_request paths or paths-ignore filter as path_filters (a folded workflow's own path names its tools/tasks/folded copy and its tools/tasks/steps directory). A group the event's changed files do not select records NOT_SELECTED and exits 0 (a run, never a skipped job; pattern StegVerse-org/StegVerse-SDK#561, StegVerse-Labs/Site#1647). Not carried: branches filters, workflow_dispatch/schedule triggers (no manual dispatch, no cron), job-level if, and GitHub's 300-changed-file rule (an undeterminable diff selects every group).",
  "repairs": [
   "test-readiness.repo-smoke used to run on every push, pull request and dispatch; it now runs on pull requests and pushes to main.",
   "auto_update.build (Governed Local Validation) used to run on path-filtered push to main and dispatch; it now runs on every pull request and push to main (a superset).",
@@ -145,6 +145,17 @@
     "python_version": "3.11",
     "artifact_name": "free-dom-local-validation",
     "artifact_if_no_files_found": "error"
+   },
+   "path_filters": {
+    "push": {
+     "paths": [
+      "data/**",
+      "scripts/**",
+      "README.md",
+      "CONTRIBUTING.md",
+      ".github/workflows/**"
+     ]
+    }
    }
   },
   {
@@ -160,6 +171,11 @@
      "name": "Workflow files equal the registered surfaces; catalog verifies ALLOW",
      "run_file": "tools/tasks/steps/workflow-surface-registry.validate/01-registry.sh",
      "run_sha256": "811824e88664923006be2eeb35632d710f5504145967f61632ad9e8fbdcb35ca"
+    },
+    {
+     "name": "Folded groups keep their original path filters (NOT_SELECTED, never skipped)",
+     "run_file": "tools/tasks/steps/workflow-surface-registry.validate/02-original-path-filters.sh",
+     "run_sha256": "9db82fbdf49b831995929ec2919b6ead95a650d1b9929cfb760742654aa3dbc7"
     }
    ],
    "artifacts": [],

@@ -9,7 +9,8 @@ its original job had. Every group run ends ALLOW, DENY or FAIL_CLOSED, and every
 non-ALLOW result carries the six fields.
 
 stdlib only. Commands:
-  matrix --event pull_request|push   print the matrix for this event
+  matrix --event pull_request|push   print the matrix for this event (each cell marked selected true|false
+                                     by the folded workflow's original path filter)
   run --group ID                     run one group's steps in order
   verify                             check the catalog against its pinned bodies
 """
@@ -343,6 +344,14 @@ def run_group(gid):
         print(json.dumps(receipt, indent=2))
         return 1
 
+    if os.environ.get("CATALOG_SELECTED") == "false":
+        # The folded workflow's original path filter did not match this event's changed files.
+        event = os.environ.get("GITHUB_EVENT_NAME", "")
+        receipt.update(disposition="NOT_SELECTED", reason={"original_path_filter_not_matched": True, "event": event},
+                       path_filters=(group.get("path_filters") or {}).get(event))
+        (receipts / f"{gid}.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps(receipt, indent=2))
+        return 0
     selected, why = selection(group)
     if not selected:
         # Selected by manifest state, not skipped: the receipt names why and what selects it.
@@ -463,7 +472,83 @@ def selection(group):
     return True, None
 
 
-def matrix(event):
+def glob_regex(pattern):
+    """GitHub Actions path-filter glob: * (no /), ** (any), ? and + (apply to the previous char), [set]."""
+    out, i = [], 0
+    while i < len(pattern):
+        c = pattern[i]
+        if pattern.startswith("**/", i):
+            out.append("(?:.*/)?")
+            i += 3
+            continue
+        if pattern.startswith("**", i):
+            out.append(".*")
+            i += 2
+            continue
+        if c == "*":
+            out.append("[^/]*")
+        elif c in "?+":
+            out.append(c)
+        elif c == "[":
+            j = pattern.find("]", i + 1)
+            if j == -1:
+                out.append(re.escape(c))
+            else:
+                out.append(pattern[i:j + 1])
+                i = j
+        else:
+            out.append(re.escape(c))
+        i += 1
+    return re.compile("^" + "".join(out) + "$")
+
+
+def path_matches(patterns, path):
+    """Ordered include/exclude semantics of `paths`: a later `!` pattern removes an earlier match."""
+    hit = False
+    for pattern in patterns:
+        if pattern.startswith("!"):
+            if glob_regex(pattern[1:]).match(path):
+                hit = False
+        elif glob_regex(pattern).match(path):
+            hit = True
+    return hit
+
+
+def filter_selects(filt, files):
+    """True when the original workflow's own paths / paths-ignore filter would have started it."""
+    if files is None or not filt:
+        return True
+    if "paths" in filt:
+        return any(path_matches(filt["paths"], f) for f in files)
+    if "paths_ignore" in filt:
+        return any(not any(glob_regex(pat).match(f) for pat in filt["paths_ignore"]) for f in files)
+    return True
+
+
+def changed_files(event, env=None):
+    """Files this event changed, or None when it cannot be determined (then every group is selected)."""
+    env = os.environ if env is None else env
+    if event == "push":
+        before, after = env.get("CATALOG_EVENT_BEFORE", ""), env.get("CATALOG_EVENT_AFTER", "")
+        if not before or set(before) == {"0"} or not after:
+            return None
+        spec = [before, after]
+    elif event == "pull_request":
+        base, head = env.get("CATALOG_PR_BASE_SHA", ""), env.get("CATALOG_PR_HEAD_SHA", "")
+        if not base or not head:
+            return None
+        spec = [base + "..." + head]
+    else:
+        return None
+    try:
+        out = subprocess.run(["git", "diff", "--name-only", *spec], cwd=ROOT, check=True,
+                             capture_output=True, text=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return [line for line in out.splitlines() if line]
+
+
+def matrix(event, files=None):
     catalog = load()
     include = []
     for group in catalog["groups"]:
@@ -473,6 +558,9 @@ def matrix(event):
             continue
         row = {"group": group["id"]}
         row.update(group.get("runner") or {})
+        # The folded workflow's own push/pull_request path filter decides whether this cell
+        # runs its steps or records NOT_SELECTED (a run, never a skipped job).
+        row["selected"] = "true" if filter_selects((group.get("path_filters") or {}).get(event), files) else "false"
         include.append(row)
     return {"include": include}
 
@@ -487,7 +575,7 @@ def main(argv=None):
     sub.add_parser("verify")
     args = parser.parse_args(argv)
     if args.cmd == "matrix":
-        print(json.dumps(matrix(args.event), separators=(",", ":")))
+        print(json.dumps(matrix(args.event, changed_files(args.event)), separators=(",", ":")))
         return 0
     if args.cmd == "run":
         return run_group(args.group)
