@@ -8,7 +8,10 @@ name: Stable validator dispatcher
 # tools/tasks/folded/), its steps the original run blocks byte for byte, pinned by
 # sha256 and refused by `run_catalog.py verify` on any drift. Same file as
 # StegVerse-Labs/StegDB .github/workflows/validation-dispatcher.yml @ eab2e773
-# below this header. A new check is a catalog entry, never a new workflow file;
+# below this header, plus the original-path-filter selection: each folded group keeps the
+# push / pull_request paths its workflow had, and a group they do not select records
+# NOT_SELECTED (a run, never a skipped job), the pattern of StegVerse-org/StegVerse-SDK#561.
+# A new check is a catalog entry, never a new workflow file;
 # control/workflow-surface-registry.json fails closed on an unregistered workflow.
 # Actions are pinned by full commit SHA.
 on:
@@ -33,11 +36,17 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
+          fetch-depth: 0
           persist-credentials: false
       - name: The catalog matches its pinned step bodies
         run: python3 tools/tasks/run_catalog.py verify
       - name: Select the catalog groups this event runs
         id: select
+        env:
+          CATALOG_EVENT_BEFORE: ${{ github.event.before }}
+          CATALOG_EVENT_AFTER: ${{ github.event.after }}
+          CATALOG_PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          CATALOG_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: echo "matrix=$(python3 tools/tasks/run_catalog.py matrix --event "$GITHUB_EVENT_NAME")" >> "$GITHUB_OUTPUT"
 
   check:
@@ -84,9 +93,11 @@ jobs:
         with:
           python-version: "${{ matrix.python_version }}"
       - name: Run the catalog group
+        env:
+          CATALOG_SELECTED: ${{ matrix.selected }}
         run: python3 tools/tasks/run_catalog.py run --group "${{ matrix.group }}"
       - name: Retain the artifact the folded job uploaded
-        if: always() && matrix.artifact_name
+        if: always() && matrix.artifact_name && matrix.selected != 'false'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ${{ matrix.artifact_name }}-${{ github.run_id }}
