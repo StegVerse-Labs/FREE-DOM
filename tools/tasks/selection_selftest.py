@@ -6,6 +6,7 @@ A group whose original filter does not match the event's changed files records N
 """
 import importlib.util
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -69,20 +70,18 @@ class GroupSelectionTests(unittest.TestCase):
                     self.assertEqual(cell(event, [pattern], gid), "true", (gid, event, pattern))
 
     def test_filters_match_the_folded_originals(self):
-        try:
-            import yaml
-        except ImportError:
-            return
+        # stdlib only: a folded original has a paths / paths-ignore filter under `on:` exactly when its group
+        # carries path_filters for that event (the values are copied from the original's own `on:` block).
         for gid, group in GROUPS.items():
             wf = Path((group.get("source") or {}).get("workflow", "")).name
             original = ROOT / "tools/tasks/folded" / wf
             if not wf or not original.is_file():
                 continue
-            doc = yaml.safe_load(original.read_text(encoding="utf-8"))
-            on = doc.get(True, doc.get("on")) or {}
+            text = original.read_text(encoding="utf-8")
+            on_block = re.split(r"^jobs:", text, maxsplit=1, flags=re.M)[0]
             for event in group["events"]:
-                cfg = on.get(event) if isinstance(on, dict) else None
-                has = bool(isinstance(cfg, dict) and (cfg.get("paths") or cfg.get("paths-ignore")))
+                m = re.search(r"^  %s:\s*\n((?:    .*\n|\s*\n)*)" % event, on_block, re.M)
+                has = bool(m and re.search(r"^    (paths|paths-ignore):", m.group(1), re.M))
                 self.assertEqual(has, event in (group.get("path_filters") or {}), (gid, event))
 
 
