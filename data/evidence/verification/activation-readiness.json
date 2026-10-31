@@ -93,7 +93,7 @@
     }
   ],
   "failures": [],
-  "generated_at": "2026-10-30T10:33:50.280726Z",
+  "generated_at": "2026-10-31T10:32:46.590941Z",
   "result": "PASS",
   "schema": "stegverse.free-dom.activation-readiness.v1",
   "verified_files_sha256": {
