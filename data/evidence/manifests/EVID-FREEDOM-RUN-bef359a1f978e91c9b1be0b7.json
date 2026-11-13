@@ -1,0 +1,51 @@
+{
+  "manifest_version": "stegverse.evidence-manifest.v1",
+  "evidence_id": "EVID-FREEDOM-RUN-bef359a1f978e91c9b1be0b7",
+  "producer_node_id": "StegVerse-Labs/FREE-DOM",
+  "created_at": "2026-11-13T10:37:38.965408Z",
+  "artifact": {
+    "media_type": "application/vnd.stegverse.search-run+json",
+    "content_hash": "sha256:bef359a1f978e91c9b1be0b7820c7eb29f9d9ded8df08afd9645c16347eff06e",
+    "size_bytes": 596,
+    "source_pointer": "data/logs/ai_agent/agent_run_20261113T103309Z.jsonl",
+    "custody": "producer-local"
+  },
+  "provenance": {
+    "origin_type": "derived-artifact",
+    "origin_pointer": "data/logs/ai_agent/agent_run_20261113T103309Z.jsonl",
+    "publisher_or_issuer": "StegVerse-Labs/FREE-DOM",
+    "author_or_actor": "github-actions:FREE-DOM-ai-search-agent",
+    "published_at": null,
+    "event_time_start": "2026-11-13T10:33:09.354794Z",
+    "event_time_end": "2026-11-13T10:37:38.965408Z",
+    "captured_at": "2026-11-13T10:37:38.965408Z",
+    "discovery_method": "FREE-DOM bounded public OSINT sweep",
+    "discovery_run_id": "20261113T103309Z",
+    "executed_commit": "ff84222c8b9e715df84dcf4beb2e07fb32023420"
+  },
+  "subjects": [
+    {
+      "subject_id": "artifact:search-run:20261113t103309z",
+      "subject_type": "artifact",
+      "display_name": "FREE-DOM search run 20261113T103309Z",
+      "identity_posture": "public-confirmed"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "CLAIM-RUN-EXECUTED-f46ab538ff8328045a210744",
+      "claim_role": "observes",
+      "claim_text": "FREE-DOM public OSINT sweep 20261113T103309Z executed under recorded scope",
+      "claim_text_hash": "sha256:f46ab538ff8328045a21074458d1f71af9fcdee22f593e6029d7ccfb396701a4",
+      "scope": "Execution and recorded result only; no absence or truth inference."
+    }
+  ],
+  "source_posture": "primary",
+  "privacy_posture": {
+    "classification": "public",
+    "public_derivative_allowed": true,
+    "redactions_required": []
+  },
+  "supersedes_manifest_id": null,
+  "manifest_hash": "sha256:cffc5b087f7507aca05e2a9fcf7becea1f9fa92cdc090378855fd02d7c72a807"
+}
